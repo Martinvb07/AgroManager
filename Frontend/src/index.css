@@ -1,0 +1,16 @@
+/* Global CSS (sin Tailwind) */
+:root {
+  --am-bg: #f8fafc; /* slate-50 */
+  --text: #1f2937; /* slate-800 */
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--am-bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
