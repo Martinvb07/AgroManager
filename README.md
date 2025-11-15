@@ -1,4 +1,5 @@
 # AgroManager
+<<<<<<< HEAD
 
 Panel de gestión agrícola con Frontend en Vite + React. Estructura inicial con carpeta `Frontend/` y una carpeta `Backend/` (a definir).
 
@@ -44,3 +45,6 @@ Pop-Location
 ## Licencia
 
 Este proyecto es de uso privado del autor a menos que se indique lo contrario.
+=======
+AgroManager Pro es un dashboard agrícola en React para gestionar parcelas, trabajadores, maquinaria, riego, plagas, semillas, fertilizantes y finanzas. Ofrece un panel moderno, métricas en tiempo real y módulos listos para ampliar o conectar con una base de datos.
+>>>>>>> 07157350bf77ab6a10ead61df733644bd1901492
