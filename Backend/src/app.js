@@ -23,7 +23,10 @@ if (env.NODE_ENV !== 'test') {
 }
 
 // API routes
+// Ruta versión histórica
 app.use('/api/v1', router);
+// Ruta simplificada para usar detrás de /api en nginx
+app.use('/', router);
 
 // Health base (fallback quick checks)
 app.get('/health', (_req, res) => {

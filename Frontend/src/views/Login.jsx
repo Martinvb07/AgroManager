@@ -1,23 +1,33 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
+import { login } from '../services/api.js';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Login de ejemplo: en el futuro se conecta al backend
     if (!email || !password) {
       setError('Ingresa tu correo y contraseña');
       return;
     }
+
     setError('');
-    // Redirigir al panel de administración
-    navigate('/admin');
+    setIsSubmitting(true);
+    try {
+      await login(email, password);
+      navigate('/admin');
+    } catch (err) {
+      const message = err?.message || 'No se pudo iniciar sesión';
+      setError(message.includes('Error') ? 'Correo o contraseña incorrectos' : message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -25,14 +35,19 @@ const Login = () => {
       <main className="login-main">
         <section className="login-card">
           <header className="login-header">
-            <span className="login-pill">Panel de administración</span>
-            <div className="login-title-row">
-              <ShieldCheck className="login-icon" aria-hidden="true" />
-              <div>
-                <h1 className="login-title">Iniciar sesión</h1>
-                <p className="login-subtitle">Accede al panel para gestionar tu campo.</p>
+            <div className="login-header-main">
+              <span className="login-pill">Panel de administración</span>
+              <div className="login-title-row">
+                <ShieldCheck className="login-icon" aria-hidden="true" />
+                <div>
+                  <h1 className="login-title">Iniciar sesión</h1>
+                  <p className="login-subtitle">Accede al panel para gestionar tu campo.</p>
+                </div>
               </div>
             </div>
+            <Link to="/" className="login-home-link">
+              Volver al inicio
+            </Link>
           </header>
 
           <form onSubmit={handleSubmit} className="login-form">
@@ -60,8 +75,8 @@ const Login = () => {
 
             {error && <p className="login-error">{error}</p>}
 
-            <button type="submit" className="login-button">
-              Entrar al panel
+            <button type="submit" className="login-button" disabled={isSubmitting}>
+              {isSubmitting ? 'Ingresando...' : 'Entrar al panel'}
             </button>
           </form>
         </section>

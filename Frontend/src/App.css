@@ -360,13 +360,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 24px 16px;
   background: linear-gradient(160deg, #047857, #059669, #0d9488);
 }
 
 .login-header {
   padding: 0 0 16px;
   color: #0f172a;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.login-header-main {
+  display: flex;
+  flex-direction: column;
 }
 
 .login-label-top {
@@ -386,11 +395,12 @@
 .login-main {
   width: 100%;
   max-width: 480px;
+  padding: 0 8px;
 }
 
 .login-form {
-  max-width: 420px;
-  margin: 0 auto;
+  max-width: 400px;
+  margin: 8px auto 0;
   display: grid;
   gap: 16px;
 }
@@ -437,18 +447,20 @@
 }
 
 .login-helper {
-  margin: 16px 0 0;
+  margin: 16px 0 4px;
   font-size: 12px;
-  color: #e5f9f0;
-  text-align: center;
+  color: #4b5563;
+  text-align: left;
 }
 
 .login-card {
   background: radial-gradient(circle at top left, #ffffff, #e5f2ff);
   border-radius: 24px;
-  padding: 24px 22px 22px;
+  padding: 28px 24px 24px;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(148, 163, 184, 0.25);
+  max-width: 520px;
+  width: 100%;
 }
 
 .login-pill {
@@ -480,6 +492,38 @@
   margin: 4px 0 0;
   font-size: 13px;
   color: #4b5563;
+}
+
+.login-home-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(15, 23, 42, 0.04);
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.login-home-link:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(209, 213, 219, 0.9);
+}
+
+@media (max-width: 640px) {
+  .login-main {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .login-card {
+    padding: 22px 16px 20px;
+    border-radius: 20px;
+  }
 }
 
 /* Ajustes responsive */
@@ -523,6 +567,11 @@
 }
 
 @media (min-width: 1024px) {
+  .login-page {
+    height: 100vh;
+    padding: 0;
+  }
+
   .shell-inner {
     max-width: 1200px;
   }
@@ -555,8 +604,8 @@
   }
 
   .login-main {
-    padding-top: 40px;
-    padding-bottom: 48px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
 

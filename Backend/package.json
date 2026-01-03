@@ -19,7 +19,8 @@
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
-    "mysql2": "^3.9.7"
+    "mysql2": "^3.9.7",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
