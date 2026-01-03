@@ -169,3 +169,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 >>>>>>> 07157350bf77ab6a10ead61df733644bd1901492
+
+
+
+# Node / temp
+nodemon
+Backend/nodemon
+Backend/agromanager-backend@*
