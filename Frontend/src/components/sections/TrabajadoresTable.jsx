@@ -11,6 +11,7 @@ const TrabajadoresTable = ({ trabajadores, calcularLiquidacion }) => {
       </div>
 
       <div className="am-card" style={{overflow:'hidden'}}>
+        <div className="am-table-wrapper">
         <table className="am-table">
           <thead className="head-blue">
             <tr>
@@ -46,6 +47,7 @@ const TrabajadoresTable = ({ trabajadores, calcularLiquidacion }) => {
             })}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

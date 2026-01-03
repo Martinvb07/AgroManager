@@ -5,6 +5,7 @@ const SemillasTable = ({ semillas }) => (
       <button className="am-badge am-success" style={{cursor:'pointer'}}>+ Agregar Semilla</button>
     </div>
     <div className="am-card" style={{overflow:'hidden'}}>
+      <div className="am-table-wrapper">
       <table className="am-table">
         <thead className="head-green">
           <tr>
@@ -30,6 +31,7 @@ const SemillasTable = ({ semillas }) => (
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 );

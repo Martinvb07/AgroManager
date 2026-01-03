@@ -5,6 +5,7 @@ const RiegoTable = ({ riego }) => (
       <button className="am-badge am-info" style={{cursor:'pointer'}}>+ Programar Riego</button>
     </div>
     <div className="am-card" style={{overflow:'hidden'}}>
+      <div className="am-table-wrapper">
       <table className="am-table">
         <thead className="head-cyan">
           <tr>
@@ -32,6 +33,7 @@ const RiegoTable = ({ riego }) => (
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 );

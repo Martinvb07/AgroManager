@@ -6,6 +6,7 @@ const FertilizantesTable = ({ fertilizantes }) => (
           <button className="am-badge am-success" style={{cursor:'pointer'}}>+ Nueva Aplicación</button>
         </div>
         <div className="am-card" style={{overflow:'hidden'}}>
+          <div className="am-table-wrapper">
           <table className="am-table">
             <thead className="head-green">
               <tr>
@@ -37,6 +38,7 @@ const FertilizantesTable = ({ fertilizantes }) => (
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
   </div>

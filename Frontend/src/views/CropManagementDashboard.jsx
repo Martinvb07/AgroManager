@@ -30,7 +30,7 @@ const CropManagementDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
 
   const [stats] = useState(initialStats);
-  const [parcelas] = useState(initialParcelas);
+  // Parcelas ahora vienen del backend via ParcelasGrid (se remueve estado local mock)
   const [trabajadores] = useState(initialTrabajadores);
   const [ingresos] = useState(initialIngresos);
   const [egresos] = useState(initialEgresos);
@@ -71,23 +71,25 @@ const CropManagementDashboard = () => {
     <div style={{minHeight:'100vh',background:'linear-gradient(135deg, #f8fafc, #ecfdf5)'}}>
       <div className="am-header">
         <div className="am-header-inner">
-          <div>
+          <div className="am-header-brand">
             <h1 className="brand-title">AgroManager</h1>
             <p className="brand-sub">Sistema Integral de Gestión Agrícola</p>
           </div>
-          <div className="user">
-            <div style={{textAlign:'right'}}>
-              <p style={{fontSize:'13px',color:'#d1fae5'}}>Usuario</p>
-              <p style={{fontSize:'14px',fontWeight:700}}>Admin Agrícola</p>
+          <div className="am-header-user">
+            <div className="am-header-user-info">
+              <p className="am-header-user-label">Usuario</p>
+              <p className="am-header-user-name">Admin Agrícola</p>
             </div>
-            <div className="am-pill"><Settings className="am-icon-lg" /></div>
+            <button className="am-pill am-header-settings" aria-label="Configuración">
+              <Settings className="am-icon-lg" />
+            </button>
           </div>
         </div>
       </div>
 
       <div className="am-container">
         <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
-        <div className="am-card" style={{padding:'32px',minHeight:'600px'}}>
+        <div className="am-card am-main-card">
           {renderContent()}
         </div>
       </div>

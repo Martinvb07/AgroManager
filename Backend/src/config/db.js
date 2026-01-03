@@ -1,9 +1,27 @@
-// Placeholder de conexión a base de datos.
-// Ejemplo MongoDB: usar mongoose o el driver oficial
-// Ejemplo Postgres: usar pg o Prisma
+import mysql from 'mysql2/promise';
+import { env } from './env.js';
 
-export async function connectDB() {
-  // Implementar cuando se defina tecnología de base de datos
-  // Devolver una promesa para mantener misma interfaz
-  return Promise.resolve();
+let pool;
+
+export function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: env.DB_HOST,
+      port: env.DB_PORT,
+      user: env.DB_USER,
+      password: env.DB_PASSWORD,
+      database: env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: env.DB_POOL_LIMIT,
+      queueLimit: 0,
+      timezone: 'Z',
+    });
+  }
+  return pool;
+}
+
+export async function testConnection() {
+  const p = getPool();
+  const [rows] = await p.query('SELECT 1 AS ok');
+  return rows?.[0]?.ok === 1;
 }

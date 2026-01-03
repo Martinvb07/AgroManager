@@ -10,14 +10,33 @@ Backend en Node.js + Express con estructura modular y lista para extender.
 ## Configuración
 
 1. Copiar variables de entorno:
-   ```bash
-   cp .env.example .env
-   ```
-   En Windows PowerShell:
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-2. Ajustar `CORS_ORIGIN` si el Frontend corre en otro puerto u host.
+
+```bash
+cp .env.example .env
+```
+
+En Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+2. Completar `.env` con los datos de tu VPS MySQL:
+
+- `DB_HOST`: IP o dominio del VPS
+- `DB_PORT`: 3306 (por defecto)
+- `DB_USER`: usuario con permisos sobre `agromanager`
+- `DB_PASSWORD`: contraseña del usuario
+- `DB_NAME`: nombre de la base (`agromanager` si usaste `db/schema.sql`)
+- `CORS_ORIGIN`: URL del Frontend (p.ej. `http://localhost:5173`)
+
+3. Probar conexión a la base de datos:
+
+```powershell
+npm run db:test
+```
+
+Deberías ver `DB connection: OK`.
 
 ## Instalación
 
@@ -34,8 +53,8 @@ npm run dev
 
 - Endpoint base: `http://localhost:3001`
 - Health checks:
-  - `GET /health`
-  - `GET /api/v1/health`
+  - `GET /health` (estado del servicio)
+  - `GET /health/db` (estado de conexión MySQL)
 
 ## Estructura
 
