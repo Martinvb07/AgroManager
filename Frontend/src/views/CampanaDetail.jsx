@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Settings } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -57,6 +57,13 @@ const CampanaDetail = () => {
     hasta: '',
   });
   const [diarioFiltrado, setDiarioFiltrado] = useState([]);
+  const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+  const [pdfRemision, setPdfRemision] = useState(null);
+  const [signatureConductorImg, setSignatureConductorImg] = useState(null);
+  const [signaturePropietarioImg, setSignaturePropietarioImg] = useState(null);
+
+  const conductorCanvasRef = useRef(null);
+  const propietarioCanvasRef = useRef(null);
 
   useEffect(() => {
     const load = async () => {
@@ -136,6 +143,90 @@ const CampanaDetail = () => {
 
     loadFiltered();
   }, [id, diarioFilter.desde, diarioFilter.hasta]);
+
+  useEffect(() => {
+    if (!signatureModalOpen) return;
+
+    const setupCanvas = (canvas, setImage) => {
+      if (!canvas) return () => {};
+      const ctx = canvas.getContext('2d');
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#000000';
+
+      let drawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const point = e.touches && e.touches[0] ? e.touches[0] : e;
+        return {
+          x: point.clientX - rect.left,
+          y: point.clientY - rect.top,
+        };
+      };
+
+      const handleDown = (e) => {
+        e.preventDefault();
+        drawing = true;
+        const pos = getPos(e);
+        lastX = pos.x;
+        lastY = pos.y;
+      };
+
+      const handleMove = (e) => {
+        if (!drawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        lastX = pos.x;
+        lastY = pos.y;
+      };
+
+      const handleUp = () => {
+        if (!drawing) return;
+        drawing = false;
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          setImage(dataUrl);
+        } catch {
+          // ignore
+        }
+      };
+
+      canvas.addEventListener('mousedown', handleDown);
+      canvas.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleUp);
+      canvas.addEventListener('touchstart', handleDown);
+      canvas.addEventListener('touchmove', handleMove);
+      window.addEventListener('touchend', handleUp);
+
+      return () => {
+        canvas.removeEventListener('mousedown', handleDown);
+        canvas.removeEventListener('mousemove', handleMove);
+        window.removeEventListener('mouseup', handleUp);
+        canvas.removeEventListener('touchstart', handleDown);
+        canvas.removeEventListener('touchmove', handleMove);
+        window.removeEventListener('touchend', handleUp);
+      };
+    };
+
+    const cleanups = [];
+    if (conductorCanvasRef.current) {
+      cleanups.push(setupCanvas(conductorCanvasRef.current, setSignatureConductorImg));
+    }
+    if (propietarioCanvasRef.current) {
+      cleanups.push(setupCanvas(propietarioCanvasRef.current, setSignaturePropietarioImg));
+    }
+
+    return () => {
+      cleanups.forEach((fn) => fn && fn());
+    };
+  }, [signatureModalOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -341,6 +432,25 @@ const CampanaDetail = () => {
     }
   };
 
+  const openSignatureModal = (remision) => {
+    setPdfRemision(remision);
+    setSignatureConductorImg(null);
+    setSignaturePropietarioImg(null);
+    setSignatureModalOpen(true);
+  };
+
+  const clearSignature = (tipo) => {
+    const canvas = tipo === 'conductor' ? conductorCanvasRef.current : propietarioCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (tipo === 'conductor') {
+      setSignatureConductorImg(null);
+    } else {
+      setSignaturePropietarioImg(null);
+    }
+  };
+
   const handlePdfRemision = (r) => {
     const doc = new jsPDF('p', 'mm', 'a4');
     doc.setFontSize(14);
@@ -362,25 +472,54 @@ const CampanaDetail = () => {
       y += lineHeight;
     };
 
-    drawRow('FECHA:', r.fecha, '', '');
+    drawRow('FECHA:', normalizeDateInput(r.fecha), '', '');
     drawRow('NOMBRE DEL CONDUCTOR:', r.nombreConductor, '', '');
     drawRow('C.C.:', r.ccConductor, '', '');
     drawRow('VEHICULO DE PLACA:', r.vehiculoPlaca, 'DE:', r.origen);
     drawRow('TRANSPORTA LA CANTIDAD DE:', r.cantidad, 'ARROZ. VARIEDAD:', r.variedad);
     drawRow('VALOR FLETE:', r.valorFlete != null ? `$${Number(r.valorFlete).toLocaleString()}` : '', '', '');
 
-    // Línea de enviado por y nota
+    // Línea de enviado por y C.C.
+    const enviadoPorTexto = r.enviadoPor || r.firmaPropietario || '';
     doc.rect(startX, y, fullWidth * 0.6, lineHeight);
     doc.rect(startX + fullWidth * 0.6, y, fullWidth * 0.4, lineHeight);
-    doc.text('ENVIADO POR:', startX + 2, y + 4);
-    doc.text('NOTA:', startX + fullWidth * 0.6 + 2, y + 4);
+    doc.text(`ENVIADO POR: ${enviadoPorTexto}`, startX + 2, y + 5);
+    doc.text(`CC.: ${r.enviadoCc || ''}`, startX + fullWidth * 0.6 + 2, y + 5);
     y += lineHeight;
 
-    doc.text('CC.: ' + (r.enviadoCc || ''), startX + 2, y + 6);
+    // Nota (solo si viene diligenciada)
+    if (r.nota) {
+      doc.text(`NOTA: ${r.nota}`, startX + 2, y + 5);
+      y += lineHeight;
+    }
 
     // Firmas
     y += lineHeight * 2;
     const firmaWidth = fullWidth / 2 - 5;
+    const firmaHeight = 20;
+
+    if (signatureConductorImg) {
+      doc.addImage(
+        signatureConductorImg,
+        'PNG',
+        startX + 5,
+        y - firmaHeight - 2,
+        firmaWidth,
+        firmaHeight,
+      );
+    }
+
+    if (signaturePropietarioImg) {
+      doc.addImage(
+        signaturePropietarioImg,
+        'PNG',
+        startX + 10 + firmaWidth,
+        y - firmaHeight - 2,
+        firmaWidth,
+        firmaHeight,
+      );
+    }
+
     doc.line(startX + 5, y, startX + 5 + firmaWidth, y);
     doc.line(startX + 10 + firmaWidth, y, startX + 10 + 2 * firmaWidth, y);
     doc.setFontSize(9);
@@ -389,6 +528,13 @@ const CampanaDetail = () => {
 
     const fileName = `remision_campana_${id}_#${r.id}.pdf`;
     doc.save(fileName);
+  };
+
+  const handleGeneratePdfWithSignatures = () => {
+    if (!pdfRemision) return;
+    handlePdfRemision(pdfRemision);
+    setSignatureModalOpen(false);
+    setPdfRemision(null);
   };
 
   return (
@@ -698,7 +844,7 @@ const CampanaDetail = () => {
                         <button className="danger" type="button" onClick={() => handleDeleteRemision(r.id)}>
                           Eliminar
                         </button>
-                        <button className="success" type="button" onClick={() => handlePdfRemision(r)}>
+                        <button className="success" type="button" onClick={() => openSignatureModal(r)}>
                           PDF
                         </button>
                       </td>
@@ -775,6 +921,67 @@ const CampanaDetail = () => {
             </div>
           </div>
         </div>
+
+        {signatureModalOpen && (
+          <div className="am-modal-backdrop">
+            <div className="am-modal" style={{ maxWidth: '620px' }}>
+              <h3 className="am-modal-title">Firmar remisión {pdfRemision ? `#${pdfRemision.id}` : ''}</h3>
+              <div className="am-modal-body">
+                <div className="am-modal-row">
+                  <label>Firma conductor</label>
+                  <canvas
+                    ref={conductorCanvasRef}
+                    width={260}
+                    height={100}
+                    style={{ border: '1px solid #e2e8f0', borderRadius: '10px', background: '#ffffff' }}
+                  />
+                  <button
+                    type="button"
+                    className="am-btn am-btn-ghost"
+                    onClick={() => clearSignature('conductor')}
+                    style={{ marginTop: '6px' }}
+                  >
+                    Borrar firma conductor
+                  </button>
+                </div>
+                <div className="am-modal-row">
+                  <label>Firma propietario</label>
+                  <canvas
+                    ref={propietarioCanvasRef}
+                    width={260}
+                    height={100}
+                    style={{ border: '1px solid #e2e8f0', borderRadius: '10px', background: '#ffffff' }}
+                  />
+                  <button
+                    type="button"
+                    className="am-btn am-btn-ghost"
+                    onClick={() => clearSignature('propietario')}
+                    style={{ marginTop: '6px' }}
+                  >
+                    Borrar firma propietario
+                  </button>
+                </div>
+              </div>
+              <div className="am-modal-actions">
+                <button
+                  type="button"
+                  className="am-btn am-btn-ghost"
+                  onClick={() => setSignatureModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="am-btn am-btn-primary"
+                  onClick={handleGeneratePdfWithSignatures}
+                  disabled={!signatureConductorImg && !signaturePropietarioImg}
+                >
+                  Generar PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
           <button
