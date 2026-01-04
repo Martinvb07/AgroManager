@@ -1,3 +1,12 @@
+const formatDate = (value) => {
+  if (!value) return '';
+  const d = new Date(value);
+  if (!Number.isNaN(d.getTime())) {
+    return d.toISOString().slice(0, 10);
+  }
+  return String(value).slice(0, 10);
+};
+
 const CampanasTable = ({ campanas, onAdd, onEdit, onDelete }) => (
   <div className="am-space-6">
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="mb-6">
@@ -28,9 +37,9 @@ const CampanasTable = ({ campanas, onAdd, onEdit, onDelete }) => (
               <tr key={c.id}>
                 <td>{c.nombre}</td>
                 <td>
-                  {c.fechaInicio} 
+                  {formatDate(c.fechaInicio)}
                   {' '}&#8594;{' '}
-                  {c.fechaFin}
+                  {formatDate(c.fechaFin)}
                 </td>
                 <td>{c.hectareas ?? '-'} ha</td>
                 <td>{c.lotes ?? '-'}</td>

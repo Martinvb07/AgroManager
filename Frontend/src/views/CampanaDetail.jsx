@@ -581,7 +581,7 @@ const CampanaDetail = () => {
                 <label>Nombre de la campaña</label>
                 <input name="nombre" value={form.nombre} onChange={handleChange} />
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-140">
                 <div className="am-modal-row">
                   <label>Fecha inicio</label>
                   <input type="date" name="fechaInicio" value={form.fechaInicio} onChange={handleChange} />
@@ -591,7 +591,7 @@ const CampanaDetail = () => {
                   <input type="date" name="fechaFin" value={form.fechaFin} onChange={handleChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-140">
                 <div className="am-modal-row">
                   <label>Hectáreas</label>
                   <input name="hectareas" value={form.hectareas} onChange={handleChange} />
@@ -650,7 +650,7 @@ const CampanaDetail = () => {
           <div className="am-card am-p-6">
             <h2 className="am-card-header">Parte diario de cosecha</h2>
             <div className="am-modal-body" style={{ marginBottom: '12px' }}>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-140">
                 <div className="am-modal-row">
                   <label>Fecha</label>
                   <input
@@ -710,7 +710,7 @@ const CampanaDetail = () => {
                 <tbody>
                   {diario.map((r) => (
                     <tr key={r.id}>
-                      <td>{r.fecha}</td>
+                      <td>{normalizeDateInput(r.fecha)}</td>
                       <td>{r.hectareas ?? '-'} ha</td>
                       <td>{r.bultos ?? '-'}</td>
                       <td>
@@ -741,7 +741,7 @@ const CampanaDetail = () => {
           <div className="am-card am-p-6">
             <h2 className="am-card-header">Remisiones de arroz</h2>
             <div className="am-modal-body" style={{ marginBottom: '12px' }}>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>Fecha</label>
                   <input type="date" name="fecha" value={remisionForm.fecha} onChange={handleRemisionChange} />
@@ -751,7 +751,7 @@ const CampanaDetail = () => {
                   <input name="nombreConductor" value={remisionForm.nombreConductor} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>C.C. conductor</label>
                   <input name="ccConductor" value={remisionForm.ccConductor} onChange={handleRemisionChange} />
@@ -761,7 +761,7 @@ const CampanaDetail = () => {
                   <input name="vehiculoPlaca" value={remisionForm.vehiculoPlaca} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>De (origen)</label>
                   <input name="origen" value={remisionForm.origen} onChange={handleRemisionChange} />
@@ -771,7 +771,7 @@ const CampanaDetail = () => {
                   <input name="cantidad" value={remisionForm.cantidad} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>Arroz variedad</label>
                   <input name="variedad" value={remisionForm.variedad} onChange={handleRemisionChange} />
@@ -781,7 +781,7 @@ const CampanaDetail = () => {
                   <input name="valorFlete" value={remisionForm.valorFlete} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>Enviado por</label>
                   <input name="enviadoPor" value={remisionForm.enviadoPor} onChange={handleRemisionChange} />
@@ -791,7 +791,7 @@ const CampanaDetail = () => {
                   <input name="enviadoCc" value={remisionForm.enviadoCc} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>Firma conductor</label>
                   <input name="firmaConductor" value={remisionForm.firmaConductor} onChange={handleRemisionChange} />
@@ -832,7 +832,7 @@ const CampanaDetail = () => {
                 <tbody>
                   {remisiones.map((r) => (
                     <tr key={r.id}>
-                      <td>{r.fecha}</td>
+                      <td>{normalizeDateInput(r.fecha)}</td>
                       <td>{r.nombreConductor}</td>
                       <td>{r.cantidad}</td>
                       <td>{r.variedad}</td>
@@ -865,7 +865,7 @@ const CampanaDetail = () => {
           <div className="am-card am-p-6">
             <h2 className="am-card-header">Información diario de cosecha</h2>
             <div className="am-modal-body" style={{ marginBottom: '12px' }}>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+              <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
                   <label>Desde</label>
                   <input

@@ -48,6 +48,11 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidde
 
 /* Grid helpers */
 .am-grid{display:grid;gap:16px}
+/* Evita overflow por contenido largo en grid */
+.am-grid > *{min-width:0}
+/* Grids de formularios dentro de las vistas de detalle */
+.am-grid-form-140{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.am-grid-form-160{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
 /* Mobile-first: una columna por defecto */
 @media(min-width:640px){.am-container{padding:20px}.am-header-inner{padding:20px 20px 24px}}
 @media(min-width:768px){.am-grid-2-md{grid-template-columns:repeat(2,1fr)}.am-grid-3-md{grid-template-columns:repeat(3,1fr)}}
@@ -106,6 +111,8 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidde
 
 /* Ajustes para móviles pequeños */
 @media(max-width:640px){
+  /* En móvil, usa más ancho útil */
+  .am-container{max-width:100%;margin:0;padding:12px 10px;}
   .am-header-inner{flex-direction:column;align-items:flex-start;gap:10px}
   .am-header-user{width:100%;justify-content:space-between}
   .am-header-user-info{text-align:left}
@@ -117,6 +124,11 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidde
   .am-card{border-radius:12px}
   .am-nav-btn{padding:10px}
   .am-nav-btn .label{font-size:11px}
+  /* Forzar una sola columna en grids de formularios en móviles muy pequeños */
+  .am-grid-form-140,.am-grid-form-160{grid-template-columns:1fr}
+  /* Forzar scroll horizontal en tablas dentro de cards */
+  .am-table-wrapper{overscroll-behavior-x:contain}
+  .am-table-wrapper .am-table{min-width:640px}
 }
 
 /* Card principal del dashboard (contenido) */
