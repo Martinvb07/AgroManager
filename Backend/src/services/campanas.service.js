@@ -156,19 +156,33 @@ export const campanasService = {
     return result.affectedRows > 0;
   },
 
-  async listDiario(userId, campanaId) {
+  async listDiario(userId, campanaId, filters = {}) {
     const pool = getPool();
-    const [rows] = await pool.query(
-      `SELECT id,
-              fecha,
-              hectareas_cortadas,
-              bultos,
-              notas
-         FROM campanas_diario
-        WHERE usuario_id = ? AND campana_id = ?
-     ORDER BY fecha ASC, id ASC`,
-      [userId, campanaId]
-    );
+    const { desde, hasta } = filters || {};
+
+    let sql = `SELECT id,
+                      fecha,
+                      hectareas_cortadas,
+                      bultos,
+                      notas
+                 FROM campanas_diario
+                WHERE usuario_id = ? AND campana_id = ?`;
+
+    const params = [userId, campanaId];
+
+    if (desde) {
+      sql += ' AND fecha >= ?';
+      params.push(desde);
+    }
+
+    if (hasta) {
+      sql += ' AND fecha <= ?';
+      params.push(hasta);
+    }
+
+    sql += ' ORDER BY fecha ASC, id ASC';
+
+    const [rows] = await pool.query(sql, params);
 
     return rows.map((row) => ({
       id: row.id,
@@ -336,9 +350,9 @@ export const campanasService = {
         origen,
         cantidad,
         variedad,
+        valorFlete,
         enviadoPor,
         enviadoCc,
-        valorFlete,
         firmaConductor,
         firmaPropietario,
         nota,

@@ -133,8 +133,15 @@ export async function eliminarCampana(id) {
   return true;
 }
 
-export async function fetchCampanaDiario(campanaId) {
-  const json = await request(`/campanas/${campanaId}/diario`);
+export async function fetchCampanaDiario(campanaId, filters) {
+  let path = `/campanas/${campanaId}/diario`;
+  if (filters && (filters.desde || filters.hasta)) {
+    const params = new URLSearchParams();
+    if (filters.desde) params.append('desde', filters.desde);
+    if (filters.hasta) params.append('hasta', filters.hasta);
+    path += `?${params.toString()}`;
+  }
+  const json = await request(path);
   return json.data;
 }
 

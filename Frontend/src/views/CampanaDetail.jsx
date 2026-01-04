@@ -52,6 +52,11 @@ const CampanaDetail = () => {
     nota: '',
   });
   const [remisionSaving, setRemisionSaving] = useState(false);
+  const [diarioFilter, setDiarioFilter] = useState({
+    desde: '',
+    hasta: '',
+  });
+  const [diarioFiltrado, setDiarioFiltrado] = useState([]);
 
   useEffect(() => {
     const load = async () => {
@@ -119,6 +124,19 @@ const CampanaDetail = () => {
     load();
   }, [id]);
 
+  useEffect(() => {
+    const loadFiltered = async () => {
+      try {
+        const data = await fetchCampanaDiario(id, diarioFilter);
+        setDiarioFiltrado(data || []);
+      } catch {
+        setDiarioFiltrado([]);
+      }
+    };
+
+    loadFiltered();
+  }, [id, diarioFilter.desde, diarioFilter.hasta]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -132,6 +150,11 @@ const CampanaDetail = () => {
   const handleRemisionChange = (e) => {
     const { name, value } = e.target;
     setRemisionForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDiarioFilterChange = (e) => {
+    const { name, value } = e.target;
+    setDiarioFilter((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
@@ -412,7 +435,7 @@ const CampanaDetail = () => {
                 <label>Nombre de la campaña</label>
                 <input name="nombre" value={form.nombre} onChange={handleChange} />
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Fecha inicio</label>
                   <input type="date" name="fechaInicio" value={form.fechaInicio} onChange={handleChange} />
@@ -422,7 +445,7 @@ const CampanaDetail = () => {
                   <input type="date" name="fechaFin" value={form.fechaFin} onChange={handleChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Hectáreas</label>
                   <input name="hectareas" value={form.hectareas} onChange={handleChange} />
@@ -460,9 +483,7 @@ const CampanaDetail = () => {
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="am-grid am-grid-2-md">
           <div className="am-card am-p-6">
             <h2 className="am-card-header">Producción y rendimiento</h2>
             <div className="am-modal-body">
@@ -483,7 +504,7 @@ const CampanaDetail = () => {
           <div className="am-card am-p-6">
             <h2 className="am-card-header">Parte diario de cosecha</h2>
             <div className="am-modal-body" style={{ marginBottom: '12px' }}>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(4,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Fecha</label>
                   <input
@@ -537,8 +558,7 @@ const CampanaDetail = () => {
                     <th>Fecha</th>
                     <th>Hectáreas cortadas</th>
                     <th>Bultos</th>
-                    <th>Notas</th>
-                    <th>Acciones</th>
+                    <th>Notas / Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -547,14 +567,16 @@ const CampanaDetail = () => {
                       <td>{r.fecha}</td>
                       <td>{r.hectareas ?? '-'} ha</td>
                       <td>{r.bultos ?? '-'}</td>
-                      <td>{r.notas || '-'}</td>
-                      <td className="am-actions">
-                        <button className="primary" type="button" onClick={() => handleEditDiario(r)}>
-                          Editar
-                        </button>
-                        <button className="danger" type="button" onClick={() => handleDeleteDiario(r.id)}>
-                          Eliminar
-                        </button>
+                      <td>
+                        {r.notas || '-'}
+                        <div className="am-actions" style={{ marginTop: '4px' }}>
+                          <button className="primary" type="button" onClick={() => handleEditDiario(r)}>
+                            Editar
+                          </button>
+                          <button className="danger" type="button" onClick={() => handleDeleteDiario(r.id)}>
+                            Eliminar
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -573,7 +595,7 @@ const CampanaDetail = () => {
           <div className="am-card am-p-6">
             <h2 className="am-card-header">Remisiones de arroz</h2>
             <div className="am-modal-body" style={{ marginBottom: '12px' }}>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Fecha</label>
                   <input type="date" name="fecha" value={remisionForm.fecha} onChange={handleRemisionChange} />
@@ -583,7 +605,7 @@ const CampanaDetail = () => {
                   <input name="nombreConductor" value={remisionForm.nombreConductor} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>C.C. conductor</label>
                   <input name="ccConductor" value={remisionForm.ccConductor} onChange={handleRemisionChange} />
@@ -593,7 +615,7 @@ const CampanaDetail = () => {
                   <input name="vehiculoPlaca" value={remisionForm.vehiculoPlaca} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>De (origen)</label>
                   <input name="origen" value={remisionForm.origen} onChange={handleRemisionChange} />
@@ -603,7 +625,7 @@ const CampanaDetail = () => {
                   <input name="cantidad" value={remisionForm.cantidad} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Arroz variedad</label>
                   <input name="variedad" value={remisionForm.variedad} onChange={handleRemisionChange} />
@@ -613,7 +635,7 @@ const CampanaDetail = () => {
                   <input name="valorFlete" value={remisionForm.valorFlete} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Enviado por</label>
                   <input name="enviadoPor" value={remisionForm.enviadoPor} onChange={handleRemisionChange} />
@@ -623,7 +645,7 @@ const CampanaDetail = () => {
                   <input name="enviadoCc" value={remisionForm.enviadoCc} onChange={handleRemisionChange} />
                 </div>
               </div>
-              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(2,1fr)', gap: '10px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
                 <div className="am-modal-row">
                   <label>Firma conductor</label>
                   <input name="firmaConductor" value={remisionForm.firmaConductor} onChange={handleRemisionChange} />
@@ -686,6 +708,65 @@ const CampanaDetail = () => {
                     <tr>
                       <td colSpan="7" style={{ fontSize: '13px', color: '#6b7280' }}>
                         Aún no hay remisiones registradas para esta campaña.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="am-card am-p-6">
+            <h2 className="am-card-header">Información diario de cosecha</h2>
+            <div className="am-modal-body" style={{ marginBottom: '12px' }}>
+              <div className="am-grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '10px' }}>
+                <div className="am-modal-row">
+                  <label>Desde</label>
+                  <input
+                    type="date"
+                    name="desde"
+                    value={diarioFilter.desde}
+                    onChange={handleDiarioFilterChange}
+                  />
+                </div>
+                <div className="am-modal-row">
+                  <label>Hasta</label>
+                  <input
+                    type="date"
+                    name="hasta"
+                    value={diarioFilter.hasta}
+                    onChange={handleDiarioFilterChange}
+                  />
+                </div>
+              </div>
+              <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
+                Filtra los cortes diarios por rango de fechas para revisar rápidamente el avance de la cosecha.
+              </p>
+            </div>
+
+            <div className="am-table-wrapper">
+              <table className="am-table">
+                <thead className="head-blue">
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Hectáreas cortadas</th>
+                    <th>Bultos</th>
+                    <th>Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {diarioFiltrado.map((r) => (
+                    <tr key={r.id}>
+                      <td>{normalizeDateInput(r.fecha)}</td>
+                      <td>{r.hectareas ?? '-'} ha</td>
+                      <td>{r.bultos ?? '-'}</td>
+                      <td>{r.notas || '-'}</td>
+                    </tr>
+                  ))}
+                  {!diarioFiltrado.length && (
+                    <tr>
+                      <td colSpan="4" style={{ fontSize: '13px', color: '#6b7280' }}>
+                        No hay registros que coincidan con el filtro seleccionado.
                       </td>
                     </tr>
                   )}

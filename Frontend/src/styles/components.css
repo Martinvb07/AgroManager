@@ -85,7 +85,9 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidde
 /* Table */
 .am-table{width:100%;border-collapse:separate;border-spacing:0}
 .am-table th,.am-table td{padding:12px 16px;text-align:left;font-size:14px}
-.am-table thead th{color:#fff;font-weight:700}
+.am-table thead th{color:#fff;font-weight:700;border-top:1px solid rgba(15,23,42,.15)}
+.am-table thead th:first-child{border-left:1px solid rgba(15,23,42,.15);border-top-left-radius:10px}
+.am-table thead th:last-child{border-right:1px solid rgba(15,23,42,.15);border-top-right-radius:10px}
 .head-blue{background:linear-gradient(90deg,var(--blue-500),var(--blue-600))}
 .head-green{background:linear-gradient(90deg,var(--green-500),var(--green-600))}
 .head-red{background:linear-gradient(90deg,var(--red-500),var(--red-600))}
@@ -98,8 +100,8 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidde
 .am-actions .danger{color:var(--red-600)}
 .am-actions .success{color:var(--green-600)}
 
-/* Tablas: ocupar siempre el ancho disponible sin scroll horizontal */
-.am-table-wrapper{width:100%;overflow-x:hidden}
+/* Tablas: ocupar siempre el ancho disponible y permitir scroll horizontal en pantallas pequeñas */
+.am-table-wrapper{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
 .am-table-wrapper .am-table{min-width:100%;table-layout:auto}
 
 /* Ajustes para móviles pequeños */

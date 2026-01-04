@@ -40,7 +40,8 @@ export const campanasController = {
   async listDiario(req, res) {
     const userId = req.user.id;
     const { id } = req.params;
-    const data = await campanasService.listDiario(userId, id);
+    const { desde, hasta } = req.query || {};
+    const data = await campanasService.listDiario(userId, id, { desde, hasta });
     res.status(200).json({ data });
   },
 
