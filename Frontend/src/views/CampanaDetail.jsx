@@ -40,13 +40,11 @@ const CampanaDetail = () => {
     ccConductor: '',
     vehiculoPlaca: '',
     origen: '',
+    destino: '',
     cantidad: '',
     variedad: '',
-    arrocera: '',
-    arroceraDe: '',
-    valor: '',
-    enviadoDesde: '',
-    corregimiento: '',
+    telefonoConductor: '',
+    telefonoPropietario: '',
     enviadoPor: '',
     enviadoCc: '',
     nota: '',
@@ -355,8 +353,11 @@ const CampanaDetail = () => {
       ccConductor: '',
       vehiculoPlaca: '',
       origen: '',
+      destino: '',
       cantidad: '',
       variedad: '',
+      telefonoConductor: '',
+      telefonoPropietario: '',
       enviadoPor: '',
       enviadoCc: '',
       valorFlete: '',
@@ -376,6 +377,9 @@ const CampanaDetail = () => {
       origen: r.origen || '',
       cantidad: r.cantidad || '',
       variedad: r.variedad || '',
+      destino: r.destino || '',
+      telefonoConductor: r.telefonoConductor || '',
+      telefonoPropietario: r.telefonoPropietario || '',
       enviadoPor: r.enviadoPor || '',
       enviadoCc: r.enviadoCc || '',
       valorFlete: r.valorFlete != null ? String(r.valorFlete) : '',
@@ -405,8 +409,11 @@ const CampanaDetail = () => {
         ccConductor: remisionForm.ccConductor,
         vehiculoPlaca: remisionForm.vehiculoPlaca,
         origen: remisionForm.origen,
+        destino: remisionForm.destino,
         cantidad: remisionForm.cantidad,
         variedad: remisionForm.variedad,
+        telefonoConductor: remisionForm.telefonoConductor,
+        telefonoPropietario: remisionForm.telefonoPropietario,
         enviadoPor: remisionForm.enviadoPor,
         enviadoCc: remisionForm.enviadoCc,
         valorFlete: remisionForm.valorFlete ? Number(remisionForm.valorFlete) : null,
@@ -476,15 +483,17 @@ const CampanaDetail = () => {
     drawRow('NOMBRE DEL CONDUCTOR:', r.nombreConductor, '', '');
     drawRow('C.C.:', r.ccConductor, '', '');
     drawRow('VEHICULO DE PLACA:', r.vehiculoPlaca, 'DE:', r.origen);
-    drawRow('TRANSPORTA LA CANTIDAD DE:', r.cantidad, 'ARROZ. VARIEDAD:', r.variedad);
+    drawRow('DESTINO:', r.destino, 'TEL. CONDUCTOR:', r.telefonoConductor);
+    drawRow('TEL. PROPIETARIO:', r.telefonoPropietario, 'ARROZ. VARIEDAD:', r.variedad);
+    drawRow('TRANSPORTA LA CANTIDAD DE:', r.cantidad, '', '');
     drawRow('VALOR FLETE:', r.valorFlete != null ? `$${Number(r.valorFlete).toLocaleString()}` : '', '', '');
 
     // Línea de enviado por y C.C.
     const enviadoPorTexto = r.enviadoPor || r.firmaPropietario || '';
     doc.rect(startX, y, fullWidth * 0.6, lineHeight);
     doc.rect(startX + fullWidth * 0.6, y, fullWidth * 0.4, lineHeight);
-    doc.text(`ENVIADO POR: ${enviadoPorTexto}`, startX + 2, y + 5);
-    doc.text(`CC.: ${r.enviadoCc || ''}`, startX + fullWidth * 0.6 + 2, y + 5);
+    doc.text(`PROPIETARIO: ${enviadoPorTexto}`, startX + 2, y + 5);
+    doc.text(`CÉDULA PROPIETARIO: ${r.enviadoCc || ''}`, startX + fullWidth * 0.6 + 2, y + 5);
     y += lineHeight;
 
     // Nota (solo si viene diligenciada)
@@ -773,8 +782,18 @@ const CampanaDetail = () => {
               </div>
               <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
-                  <label>Arroz variedad</label>
-                  <input name="variedad" value={remisionForm.variedad} onChange={handleRemisionChange} />
+                  <label>Destino</label>
+                  <input name="destino" value={remisionForm.destino} onChange={handleRemisionChange} />
+                </div>
+                <div className="am-modal-row">
+                  <label>Teléfono conductor</label>
+                  <input name="telefonoConductor" value={remisionForm.telefonoConductor} onChange={handleRemisionChange} />
+                </div>
+              </div>
+              <div className="am-grid am-grid-form-160">
+                <div className="am-modal-row">
+                  <label>Teléfono propietario</label>
+                  <input name="telefonoPropietario" value={remisionForm.telefonoPropietario} onChange={handleRemisionChange} />
                 </div>
                 <div className="am-modal-row">
                   <label>Valor flete</label>
@@ -783,11 +802,17 @@ const CampanaDetail = () => {
               </div>
               <div className="am-grid am-grid-form-160">
                 <div className="am-modal-row">
-                  <label>Enviado por</label>
+                  <label>Arroz variedad</label>
+                  <input name="variedad" value={remisionForm.variedad} onChange={handleRemisionChange} />
+                </div>
+              </div>
+              <div className="am-grid am-grid-form-160">
+                <div className="am-modal-row">
+                  <label>Propietario</label>
                   <input name="enviadoPor" value={remisionForm.enviadoPor} onChange={handleRemisionChange} />
                 </div>
                 <div className="am-modal-row">
-                  <label>C.C. enviado por</label>
+                  <label>Cédula propietario</label>
                   <input name="enviadoCc" value={remisionForm.enviadoCc} onChange={handleRemisionChange} />
                 </div>
               </div>

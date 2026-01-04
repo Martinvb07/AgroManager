@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TrabajadoresTable = ({ trabajadores, calcularLiquidacion, onAdd, onEdit, onDelete }) => {
+const TrabajadoresTable = ({ trabajadores, calcularLiquidacion, onAdd, onEdit, onDelete, onLiquidar }) => {
   const estadoClass = (estado) => (estado === 'Activo' ? 'am-success' : 'am-muted');
 
   return (
@@ -43,7 +43,13 @@ const TrabajadoresTable = ({ trabajadores, calcularLiquidacion, onAdd, onEdit, o
                     <button className="primary" onClick={() => onEdit && onEdit(t)}>Editar</button>
                     <button
                       className="success"
-                      onClick={() => alert(`Liquidación de ${t.nombre}:\n\nSalario Bruto: $${liq.salarioBruto.toLocaleString()}\nHoras Extras: $${liq.horasExtras.toFixed(2)}\nDeducciones: $${liq.deducciones.toFixed(2)}\n\nSalario Neto: $${liq.salarioNeto.toFixed(2)}`)}
+                      onClick={() => {
+                        if (onLiquidar) {
+                          onLiquidar(t, liq);
+                        } else {
+                          alert(`Liquidación de ${t.nombre}:\n\nSalario Bruto: $${liq.salarioBruto.toLocaleString()}\nHoras Extras: $${liq.horasExtras.toFixed(2)}\nDeducciones: $${liq.deducciones.toFixed(2)}\n\nSalario Neto: $${liq.salarioNeto.toFixed(2)}`);
+                        }
+                      }}
                     >
                       Liquidar
                     </button>

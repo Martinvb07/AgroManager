@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import Navigation from '../components/sections/Navigation.jsx';
@@ -15,7 +15,6 @@ import ReportesGrid from '../components/sections/ReportesGrid.jsx';
 import CampanasTable from '../components/sections/CampanasTable.jsx';
 
 import {
-  stats as initialStats,
   parcelas as initialParcelas,
   fertilizantes as initialFertilizantes,
   campanas as initialCampanas,
@@ -30,7 +29,6 @@ const CropManagementDashboard = () => {
   const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
   const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
-  const [stats] = useState(initialStats);
   const [trabajadores, setTrabajadores] = useState([]);
   const [ingresos, setIngresos] = useState([]);
   const [egresos, setEgresos] = useState([]);
@@ -68,6 +66,9 @@ const CropManagementDashboard = () => {
   });
 
   const [deleteTrabajadorId, setDeleteTrabajadorId] = useState(null);
+
+  const [liquidacionModalOpen, setLiquidacionModalOpen] = useState(false);
+  const [liquidacionData, setLiquidacionData] = useState(null);
 
   // Modales: finanzas
   const [ingresoModalOpen, setIngresoModalOpen] = useState(false);
@@ -161,6 +162,95 @@ const CropManagementDashboard = () => {
   });
   const [deleteCampanaId, setDeleteCampanaId] = useState(null);
 
+  const dashboardStats = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const sumByMonth = (items, field) => {
+      if (!Array.isArray(items)) return 0;
+      return items.reduce((sum, item) => {
+        const value = Number(item[field] ?? item.monto ?? 0) || 0;
+        const dateStr = item.fecha || item.fechaDetec || item.ultimoRiego || item.proximoRiego;
+        if (!dateStr) return sum;
+        const d = new Date(dateStr);
+        if (Number.isNaN(d.getTime())) return sum;
+        if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return sum;
+        return sum + value;
+      }, 0);
+    };
+
+    const ingresosMes = sumByMonth(ingresos, 'monto');
+    const gastosMes = sumByMonth(egresos, 'monto');
+
+    const parcelasActivas = Array.isArray(parcelas)
+      ? parcelas.filter((p) => (p.estado || '').toLowerCase().includes('activa')).length || parcelas.length || 0
+      : 0;
+
+    const trabajadoresCount = Array.isArray(trabajadores) ? trabajadores.length : 0;
+
+    const maquinariasOperativas = Array.isArray(maquinaria)
+      ? maquinaria.filter((m) => (m.estado || '').toLowerCase() === 'operativo').length || maquinaria.length || 0
+      : 0;
+
+    return {
+      parcelasActivas,
+      trabajadores: trabajadoresCount,
+      ingresosMes,
+      gastosMes,
+      maquinariasOperativas,
+    };
+  }, [parcelas, trabajadores, ingresos, egresos, maquinaria]);
+
+  const dashboardAlerts = useMemo(() => {
+    const alerts = [];
+
+    if (Array.isArray(maquinaria) && maquinaria.length) {
+      const mantenimiento = maquinaria.find(
+        (m) => (m.estado || '').toLowerCase() === 'mantenimiento'
+      );
+      if (mantenimiento) {
+        alerts.push({
+          id: 'mantenimiento',
+          variant: 'warning',
+          title: 'Mantenimiento pendiente',
+          description: `${mantenimiento.nombre} requiere revisión`,
+        });
+      }
+    }
+
+    if (Array.isArray(plagas) && plagas.length) {
+      const plaga = plagas[0];
+      alerts.push({
+        id: `plaga-${plaga.id}`,
+        variant: 'danger',
+        title: 'Plaga detectada',
+        description: `${plaga.tipo || 'Plaga'} (${plaga.severidad}) en cultivo ${plaga.cultivo}`,
+      });
+    }
+
+    if (Array.isArray(riego) && riego.length) {
+      const today = new Date();
+      const programado = riego.find((r) => {
+        if (!r.proximoRiego) return false;
+        const d = new Date(r.proximoRiego);
+        if (Number.isNaN(d.getTime())) return false;
+        return d >= today;
+      });
+
+      if (programado) {
+        alerts.push({
+          id: `riego-${programado.id}`,
+          variant: 'info',
+          title: 'Riego programado',
+          description: `${programado.parcela || '-'} - ${programado.proximoRiego}`,
+        });
+      }
+    }
+
+    return alerts;
+  }, [maquinaria, plagas, riego]);
+
   useEffect(() => {
     fetchTrabajadores()
       .then(setTrabajadores)
@@ -216,6 +306,11 @@ const CropManagementDashboard = () => {
     setDeleteTrabajadorId(id);
   };
 
+  const handleLiquidarTrabajador = (trabajador, liquidacion) => {
+    setLiquidacionData({ trabajador, liquidacion });
+    setLiquidacionModalOpen(true);
+  };
+
   const handleAddIngreso = async () => {
     setIngresoForm({ concepto: '', monto: '', fecha: new Date().toISOString().slice(0, 10), tipo: 'Venta' });
     setIngresoModalOpen(true);
@@ -251,9 +346,46 @@ const CropManagementDashboard = () => {
 
   const confirmDeleteTrabajador = async () => {
     if (!deleteTrabajadorId) return;
-    await eliminarTrabajador(deleteTrabajadorId);
-    setTrabajadores((prev) => prev.filter((t) => t.id !== deleteTrabajadorId));
-    setDeleteTrabajadorId(null);
+    try {
+      await eliminarTrabajador(deleteTrabajadorId);
+      setTrabajadores((prev) =>
+        prev.filter((t) => String(t.id) !== String(deleteTrabajadorId))
+      );
+    } catch (err) {
+      console.error('Error eliminando trabajador', err);
+      if (typeof window !== 'undefined') {
+        window.alert('No se pudo eliminar el trabajador. Revisa la conexión o vuelve a intentarlo.');
+      }
+    } finally {
+      setDeleteTrabajadorId(null);
+    }
+  };
+
+  const submitLiquidacionEgreso = async () => {
+    if (!liquidacionData) return;
+
+    const { trabajador, liquidacion } = liquidacionData;
+    const monto = Number(liquidacion?.salarioNeto || 0) || 0;
+
+    const payload = {
+      concepto: `Liquidación de ${trabajador.nombre}`,
+      monto,
+      fecha: new Date().toISOString().slice(0, 10),
+      tipo: 'Personal',
+      categoria: 'Salarios',
+    };
+
+    try {
+      const created = await crearEgreso(payload);
+      setEgresos((prev) => [created, ...prev]);
+      setLiquidacionModalOpen(false);
+      setLiquidacionData(null);
+    } catch (err) {
+      console.error('Error registrando liquidación como egreso', err);
+      if (typeof window !== 'undefined') {
+        window.alert('No se pudo registrar la liquidación en egresos. Intenta nuevamente.');
+      }
+    }
   };
 
   const submitIngreso = async () => {
@@ -654,7 +786,14 @@ const CropManagementDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
-        return <DashboardOverview stats={stats} ingresos={ingresos} egresos={egresos} />;
+        return (
+          <DashboardOverview
+            stats={dashboardStats}
+            ingresos={ingresos}
+            egresos={egresos}
+            alerts={dashboardAlerts}
+          />
+        );
       case 'trabajadores':
         return (
           <TrabajadoresTable
@@ -663,6 +802,7 @@ const CropManagementDashboard = () => {
             onAdd={handleAddTrabajador}
             onEdit={handleEditTrabajador}
             onDelete={handleDeleteTrabajador}
+            onLiquidar={handleLiquidarTrabajador}
           />
         );
       case 'finanzas':
@@ -794,7 +934,9 @@ const CropManagementDashboard = () => {
               </div>
               <div className="am-modal-row">
                 <label>Inversión</label>
-                <p>${'{'}Number(parcelaDetalle.inversion || 0).toLocaleString(){'}'}</p>
+                <p>
+                  ${Number(parcelaDetalle.inversion || 0).toLocaleString()}
+                </p>
               </div>
             </div>
             <div className="am-modal-actions">
@@ -1547,6 +1689,51 @@ const CropManagementDashboard = () => {
                 onClick={confirmDeleteTrabajador}
               >
                 Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {liquidacionModalOpen && liquidacionData && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">Liquidación de {liquidacionData.trabajador.nombre}</h3>
+            <div className="am-modal-body">
+              <div className="am-modal-row">
+                <label>Salario bruto</label>
+                <p>${liquidacionData.liquidacion.salarioBruto.toLocaleString()}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Horas extras</label>
+                <p>${liquidacionData.liquidacion.horasExtras.toFixed(2)}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Deducciones</label>
+                <p>${liquidacionData.liquidacion.deducciones.toFixed(2)}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Salario neto</label>
+                <p style={{ fontWeight: 600 }}>${liquidacionData.liquidacion.salarioNeto.toFixed(2)}</p>
+              </div>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-ghost"
+                onClick={() => {
+                  setLiquidacionModalOpen(false);
+                  setLiquidacionData(null);
+                }}
+              >
+                Cerrar
+              </button>
+              <button
+                type="button"
+                className="am-btn am-btn-primary"
+                onClick={submitLiquidacionEgreso}
+              >
+                Registrar en egresos
               </button>
             </div>
           </div>
