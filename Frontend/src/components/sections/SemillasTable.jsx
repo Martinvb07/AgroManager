@@ -1,8 +1,8 @@
-const SemillasTable = ({ semillas }) => (
+const SemillasTable = ({ semillas, onAdd, onEdit, onDelete }) => (
   <div className="am-space-6">
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}} className="mb-6">
       <h2 className="am-section-title">Inventario de Semillas</h2>
-      <button className="am-badge am-success" style={{cursor:'pointer'}}>+ Agregar Semilla</button>
+      <button className="am-badge am-success" style={{cursor:'pointer'}} onClick={onAdd}>+ Agregar Semilla</button>
     </div>
     <div className="am-card" style={{overflow:'hidden'}}>
       <div className="am-table-wrapper">
@@ -24,8 +24,8 @@ const SemillasTable = ({ semillas }) => (
               <td>${s.costo.toLocaleString()}</td>
               <td>{s.proveedor}</td>
               <td className="am-actions">
-                <button className="success">Editar</button>
-                <button className="danger">Eliminar</button>
+                <button className="success" onClick={() => onEdit(s)}>Editar</button>
+                <button className="danger" onClick={() => onDelete(s.id)}>Eliminar</button>
               </td>
             </tr>
           ))}

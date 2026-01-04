@@ -55,6 +55,35 @@ export const fertilizantes = [
   { id: 2, nombre: 'Urea 46%', cantidad: '1500 kg', fechaAplicacion: '2025-11-08', parcela: 'Parcela Sur B', costo: 9500 },
 ];
 
+export const campanas = [
+  {
+    id: 1,
+    nombre: 'Campaña 1 (Abril - Julio)',
+    fechaInicio: '2025-04-01',
+    fechaFin: '2025-07-31',
+    hectareas: 20,
+    lotes: 3,
+    inversionTotal: 50000,
+    gastosOperativos: 32000,
+    ingresoTotal: 90000,
+    rendimientoHa: 7.5,
+    produccionTotal: 150,
+  },
+  {
+    id: 2,
+    nombre: 'Campaña 2 (Agosto - Diciembre)',
+    fechaInicio: '2025-08-01',
+    fechaFin: '2025-12-15',
+    hectareas: 18,
+    lotes: 2,
+    inversionTotal: 43000,
+    gastosOperativos: 29000,
+    ingresoTotal: 82000,
+    rendimientoHa: 6.8,
+    produccionTotal: 122,
+  },
+];
+
 export const calcularLiquidacion = (trabajador) => {
   const salarioBruto = trabajador.salario;
   const horasExtras = trabajador.horasTrabajadas > 160

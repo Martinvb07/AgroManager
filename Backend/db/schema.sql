@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS agromanager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE agromanager;
 
--- Tabla de parcelas
+-- Tabla de parcelas (multi-tenant por usuario)
 CREATE TABLE IF NOT EXISTS parcelas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(120) NOT NULL,
@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS parcelas (
   cultivo VARCHAR(80) NULL,
   estado VARCHAR(40) NOT NULL DEFAULT 'Activa',
   inversion DECIMAL(12,2) NOT NULL DEFAULT 0,
+  usuario_id INT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_parcelas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla de trabajadores
@@ -21,8 +23,10 @@ CREATE TABLE IF NOT EXISTS trabajadores (
   salario DECIMAL(12,2) NOT NULL DEFAULT 0,
   horas_trabajadas INT NOT NULL DEFAULT 0,
   estado VARCHAR(40) NOT NULL DEFAULT 'Activo',
+  usuario_id INT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_trabajadores_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla ingresos (relaciona opcionalmente con parcela)
@@ -33,8 +37,10 @@ CREATE TABLE IF NOT EXISTS ingresos (
   fecha DATE NOT NULL,
   tipo VARCHAR(40) NOT NULL,
   parcela_id INT NULL,
+  usuario_id INT NULL,
   FOREIGN KEY (parcela_id) REFERENCES parcelas(id) ON DELETE SET NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ingresos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla egresos
@@ -45,7 +51,9 @@ CREATE TABLE IF NOT EXISTS egresos (
   fecha DATE NOT NULL,
   tipo VARCHAR(40) NOT NULL,
   categoria VARCHAR(80) NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_egresos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla maquinaria
@@ -56,7 +64,9 @@ CREATE TABLE IF NOT EXISTS maquinaria (
   estado VARCHAR(40) NOT NULL DEFAULT 'Operativo',
   ultimo_mantenimiento DATE NULL,
   proximo_mantenimiento DATE NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_maquinaria_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla semillas
@@ -66,7 +76,9 @@ CREATE TABLE IF NOT EXISTS semillas (
   cantidad VARCHAR(40) NULL,
   proveedor VARCHAR(120) NULL,
   costo DECIMAL(12,2) NOT NULL DEFAULT 0,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_semillas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla plagas
@@ -77,7 +89,9 @@ CREATE TABLE IF NOT EXISTS plagas (
   ubicacion VARCHAR(160) NULL,
   fecha DATE NOT NULL,
   tratamiento VARCHAR(120) NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_plagas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla riego
@@ -89,7 +103,9 @@ CREATE TABLE IF NOT EXISTS riego (
   proximo_riego DATE NULL,
   consumo_agua VARCHAR(40) NULL,
   FOREIGN KEY (parcela_id) REFERENCES parcelas(id) ON DELETE SET NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_riego_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Tabla fertilizantes
@@ -101,7 +117,64 @@ CREATE TABLE IF NOT EXISTS fertilizantes (
   parcela_id INT NULL,
   costo DECIMAL(12,2) NOT NULL DEFAULT 0,
   FOREIGN KEY (parcela_id) REFERENCES parcelas(id) ON DELETE SET NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_fertilizantes_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Tabla campanas (campañas agrícolas)
+CREATE TABLE IF NOT EXISTS campanas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(160) NOT NULL,
+  fecha_inicio DATE NOT NULL,
+  fecha_fin DATE NOT NULL,
+  hectareas DECIMAL(10,2) NULL,
+  lotes INT NULL,
+  inversion_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+  gastos_operativos DECIMAL(12,2) NOT NULL DEFAULT 0,
+  ingreso_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+  rendimiento_ha DECIMAL(10,2) NULL,
+  produccion_total DECIMAL(12,2) NULL,
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_campanas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Registros diarios por campaña (avance de cosecha)
+CREATE TABLE IF NOT EXISTS campanas_diario (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  campana_id INT NOT NULL,
+  fecha DATE NOT NULL,
+  hectareas_cortadas DECIMAL(10,2) NULL,
+  bultos INT NULL,
+  notas VARCHAR(255) NULL,
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_campanas_diario_campana FOREIGN KEY (campana_id) REFERENCES campanas(id) ON DELETE CASCADE,
+  CONSTRAINT fk_campanas_diario_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Remisiones de arroz por campaña
+CREATE TABLE IF NOT EXISTS remisiones (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  campana_id INT NOT NULL,
+  fecha DATE NOT NULL,
+  nombre_conductor VARCHAR(160) NULL,
+  cc_conductor VARCHAR(40) NULL,
+  vehiculo_placa VARCHAR(40) NULL,
+  origen VARCHAR(160) NULL,
+  cantidad VARCHAR(80) NULL,
+  variedad VARCHAR(80) NULL,
+  valor_flete DECIMAL(12,2) NULL,
+  enviado_por VARCHAR(160) NULL,
+  enviado_cc VARCHAR(40) NULL,
+  firma_conductor VARCHAR(160) NULL,
+  firma_propietario VARCHAR(160) NULL,
+  nota VARCHAR(255) NULL,
+  usuario_id INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_remisiones_campana FOREIGN KEY (campana_id) REFERENCES campanas(id) ON DELETE CASCADE,
+  CONSTRAINT fk_remisiones_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Datos de ejemplo iniciales para parcelas

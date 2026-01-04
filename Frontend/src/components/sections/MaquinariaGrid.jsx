@@ -5,11 +5,17 @@ const estadoClass = (estado) => ({
   'Mantenimiento': 'am-warning',
 }[estado] || 'am-muted');
 
-const MaquinariaGrid = ({ maquinaria }) => (
+const MaquinariaGrid = ({ maquinaria, onAdd, onEdit, onDelete }) => (
   <div className="am-space-6">
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}} className="mb-6">
       <h2 className="am-section-title">Gestión de Maquinaria</h2>
-      <button className="am-badge am-warning" style={{cursor:'pointer'}}>+ Registrar Maquinaria</button>
+      <button
+        className="am-badge am-warning"
+        style={{cursor:'pointer'}}
+        onClick={onAdd}
+      >
+        + Registrar Maquinaria
+      </button>
     </div>
     <div className="am-grid am-grid-2-md" style={{gap:'16px'}}>
       {maquinaria.map((maq) => (
@@ -25,8 +31,14 @@ const MaquinariaGrid = ({ maquinaria }) => (
             <p><span style={{fontWeight:600}}>Próximo mantenimiento:</span> {maq.proximoMantenimiento}</p>
           </div>
           <div style={{marginTop:'12px',display:'flex',gap:'12px'}}>
-            <button className="am-actions primary">Editar</button>
-            <button className="am-actions" style={{color:'#2563eb'}}>Mantenimiento</button>
+            <button className="am-actions primary" onClick={() => onEdit && onEdit(maq)}>Editar</button>
+            <button
+              className="am-actions danger"
+              style={{color:'#dc2626'}}
+              onClick={() => onDelete && onDelete(maq.id)}
+            >
+              Eliminar
+            </button>
           </div>
         </div>
       ))}

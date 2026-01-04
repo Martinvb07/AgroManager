@@ -91,6 +91,7 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0}
 .head-red{background:linear-gradient(90deg,var(--red-500),var(--red-600))}
 .head-amber{background:linear-gradient(90deg,var(--amber-500),var(--amber-600))}
 .head-cyan{background:linear-gradient(90deg,var(--cyan-500),var(--cyan-600))}
+.head-violet{background:linear-gradient(90deg,var(--violet-500),var(--violet-600))}
 .am-table tbody tr{border-bottom:1px solid var(--slate-100)}
 .am-actions button{font-weight:600;border:none;background:none;cursor:pointer}
 .am-actions .primary{color:var(--blue-600)}
@@ -121,5 +122,58 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0}
 @media(max-width:640px){
   .am-main-card{padding:16px;min-height:auto}
 }
+
+/* Modal general para dashboard */
+.am-modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:40;
+}
+.am-modal{
+  background:var(--white);
+  border-radius:18px;
+  max-width:420px;
+  width:100%;
+  margin:16px;
+  box-shadow:0 24px 60px rgba(15,23,42,.45);
+  padding:20px 20px 18px;
+}
+.am-modal-title{
+  margin:0 0 12px;
+  font-size:18px;
+  font-weight:700;
+  color:var(--slate-800);
+}
+.am-modal-body{display:grid;gap:10px;margin-bottom:16px;font-size:14px}
+.am-modal-row label{display:block;font-size:12px;font-weight:600;color:var(--slate-600);margin-bottom:4px}
+.am-modal-row input,.am-modal-row select{
+  width:100%;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--slate-200,#e2e8f0);
+  font-size:14px;
+  box-sizing:border-box;
+  display:block;
+}
+.am-modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+.am-btn{
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+}
+.am-btn-ghost{background:var(--white);color:var(--slate-700,#334155);border:1px solid var(--slate-200,#e2e8f0)}
+.am-btn-primary{background:linear-gradient(135deg,var(--emerald-500),var(--emerald-600));color:var(--white)}
+.am-btn-danger{background:linear-gradient(135deg,var(--red-500),var(--red-600));color:var(--white)}
 
 

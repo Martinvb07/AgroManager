@@ -8,19 +8,19 @@ const Landing = () => {
       id: 1,
       title: 'Panel en tiempo real',
       caption: 'Visualiza tus indicadores clave de campo, personal y finanzas de un vistazo.',
-      image: '/hero/dashboard-1.png', // reemplaza por tus capturas reales
+      image: '/hero/AgroManager1.png', 
     },
     {
       id: 2,
       title: 'Gestión de parcelas',
       caption: 'Recorre tus lotes, cultivos y rotaciones con una vista clara y simple.',
-      image: '/hero/parcelas-1.png',
+      image: '/hero/AgroManager2.png',
     },
     {
       id: 3,
       title: 'Equipo coordinado',
       caption: 'Controla tareas, horas y maquinaria para que todo el equipo esté alineado.',
-      image: '/hero/equipo-1.png',
+      image: '/hero/AgroManager3.png',
     },
   ];
 

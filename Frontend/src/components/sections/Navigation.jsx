@@ -1,4 +1,4 @@
-import { Sprout, Droplets, Bug, MapPin, Leaf, Users, DollarSign, Truck, FileText, TrendingUp } from 'lucide-react';
+import { Sprout, Droplets, Bug, MapPin, Leaf, Users, DollarSign, Truck, FileText, TrendingUp, CalendarRange } from 'lucide-react';
 
 const sections = [
   { id: 'dashboard', name: 'Dashboard', icon: TrendingUp, color: 'indigo' },
@@ -6,6 +6,7 @@ const sections = [
   { id: 'trabajadores', name: 'Personal', icon: Users, color: 'blue' },
   { id: 'finanzas', name: 'Finanzas', icon: DollarSign, color: 'violet' },
   { id: 'maquinaria', name: 'Maquinaria', icon: Truck, color: 'orange' },
+  { id: 'campanas', name: 'Campañas', icon: CalendarRange, color: 'amber' },
   { id: 'semillas', name: 'Semillas', icon: Sprout, color: 'green' },
   { id: 'plagas', name: 'Plagas', icon: Bug, color: 'red' },
   { id: 'riego', name: 'Riego', icon: Droplets, color: 'cyan' },

@@ -1,8 +1,8 @@
-const RiegoTable = ({ riego }) => (
+const RiegoTable = ({ riego, onAdd, onEdit, onDelete }) => (
   <div className="am-space-6">
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}} className="mb-6">
       <h2 className="am-section-title">Programación de Riego</h2>
-      <button className="am-badge am-info" style={{cursor:'pointer'}}>+ Programar Riego</button>
+      <button className="am-badge am-info" style={{cursor:'pointer'}} onClick={onAdd}>+ Programar Riego</button>
     </div>
     <div className="am-card" style={{overflow:'hidden'}}>
       <div className="am-table-wrapper">
@@ -26,8 +26,8 @@ const RiegoTable = ({ riego }) => (
               <td>{item.ultimoRiego}</td>
               <td>{item.proximoRiego}</td>
               <td className="am-actions">
-                <button className="primary">Editar</button>
-                <button className="success">Regar ahora</button>
+                <button className="primary" onClick={() => onEdit(item)}>Editar</button>
+                <button className="danger" onClick={() => onDelete(item.id)}>Eliminar</button>
               </td>
             </tr>
           ))}

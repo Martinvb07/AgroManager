@@ -20,7 +20,11 @@ const Login = () => {
     setError('');
     setIsSubmitting(true);
     try {
-      await login(email, password);
+      const { data, token } = await login(email, password);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(data));
+      }
       navigate('/admin');
     } catch (err) {
       const message = err?.message || 'No se pudo iniciar sesión';

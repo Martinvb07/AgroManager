@@ -1,3 +1,5 @@
+import { getEstadoColor } from '../../services/mockData';
+
 const FertilizantesTable = ({ fertilizantes }) => (
   <div className="space-y-4">
       <div className="am-space-6">
@@ -26,7 +28,7 @@ const FertilizantesTable = ({ fertilizantes }) => (
                   <td>{item.dosis}</td>
                   <td>{item.fecha}</td>
                   <td>
-                    <span className="am-badge" style={{...getEstadoColor(item.estado)}}>
+                    <span className={`am-badge ${getEstadoColor(item.estado)}`}>
                       {item.estado}
                     </span>
                   </td>

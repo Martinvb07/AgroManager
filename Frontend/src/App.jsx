@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Landing from './views/Landing.jsx';
 import Login from './views/Login.jsx';
 import CropManagementDashboard from './views/CropManagementDashboard.jsx';
+import CampanaDetail from './views/CampanaDetail.jsx';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<CropManagementDashboard />} />
+        <Route path="/admin/campanas/:id" element={<CampanaDetail />} />
       </Routes>
     </BrowserRouter>
   );

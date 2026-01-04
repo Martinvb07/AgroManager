@@ -1,4 +1,6 @@
+import jwt from 'jsonwebtoken';
 import { authService } from '../services/auth.service.js';
+import { env } from '../config/env.js';
 
 export const authController = {
   async login(req, res) {
@@ -10,6 +12,12 @@ export const authController = {
 
     const user = await authService.loginWithEmailPassword(email, password);
 
-    res.status(200).json({ data: user });
+    const token = jwt.sign(
+      { id: user.id, rol: user.rol },
+      env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    res.status(200).json({ data: user, token });
   },
 };

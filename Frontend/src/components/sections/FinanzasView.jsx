@@ -1,4 +1,4 @@
-const FinanzasView = ({ ingresos, egresos }) => {
+const FinanzasView = ({ ingresos, egresos, onAddIngreso, onAddEgreso }) => {
   const totalIngresos = ingresos.reduce((s, i) => s + i.monto, 0);
   const totalEgresos = egresos.reduce((s, e) => s + e.monto, 0);
   const balance = totalIngresos - totalEgresos;
@@ -17,7 +17,13 @@ const FinanzasView = ({ ingresos, egresos }) => {
         <div className="am-card am-p-6">
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
             <h3 className="am-card-header">Ingresos</h3>
-            <button className="am-badge am-success" style={{cursor:'pointer'}}>+ Registrar</button>
+            <button
+              className="am-badge am-success"
+              style={{cursor:'pointer'}}
+              onClick={onAddIngreso}
+            >
+              + Registrar
+            </button>
           </div>
           <div style={{display:'grid',gap:'12px',maxHeight:'380px',overflow:'auto'}}>
             {ingresos.map((ingreso) => (
@@ -35,7 +41,13 @@ const FinanzasView = ({ ingresos, egresos }) => {
         <div className="am-card am-p-6">
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
             <h3 className="am-card-header">Egresos</h3>
-            <button className="am-badge am-danger" style={{cursor:'pointer'}}>+ Registrar</button>
+            <button
+              className="am-badge am-danger"
+              style={{cursor:'pointer'}}
+              onClick={onAddEgreso}
+            >
+              + Registrar
+            </button>
           </div>
           <div style={{display:'grid',gap:'12px',maxHeight:'380px',overflow:'auto'}}>
             {egresos.map((egreso) => (
