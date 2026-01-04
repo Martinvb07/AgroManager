@@ -21,7 +21,7 @@ import {
   campanas as initialCampanas,
   calcularLiquidacion,
 } from '../services/mockData.js';
-import { fetchParcelas, fetchTrabajadores, crearTrabajador, actualizarTrabajador, eliminarTrabajador, fetchFinanzas, crearIngreso, crearEgreso, fetchMaquinaria, crearMaquinaria, actualizarMaquinaria, eliminarMaquinaria, fetchSemillas, crearSemilla, actualizarSemilla, eliminarSemilla, fetchPlagas, crearPlaga, actualizarPlaga, eliminarPlaga, fetchRiego, crearRiego, actualizarRiego, eliminarRiego, fetchCampanas, crearCampana, actualizarCampana, eliminarCampana } from '../services/api.js';
+import { fetchParcelas, crearParcela, actualizarParcela, eliminarParcela, fetchTrabajadores, crearTrabajador, actualizarTrabajador, eliminarTrabajador, fetchFinanzas, crearIngreso, crearEgreso, fetchMaquinaria, crearMaquinaria, actualizarMaquinaria, eliminarMaquinaria, fetchSemillas, crearSemilla, actualizarSemilla, eliminarSemilla, fetchPlagas, crearPlaga, actualizarPlaga, eliminarPlaga, fetchRiego, crearRiego, actualizarRiego, eliminarRiego, fetchCampanas, crearCampana, actualizarCampana, eliminarCampana } from '../services/api.js';
 
 const CropManagementDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -40,7 +40,21 @@ const CropManagementDashboard = () => {
   const [semillas, setSemillas] = useState([]);
   const [plagas, setPlagas] = useState([]);
   const [riego, setRiego] = useState([]);
-  const [fertilizantes] = useState(initialFertilizantes);
+  const [fertilizantes, setFertilizantes] = useState(initialFertilizantes);
+
+  // Modales: parcelas
+  const [parcelaModalOpen, setParcelaModalOpen] = useState(false);
+  const [parcelaEditing, setParcelaEditing] = useState(null);
+  const [parcelaDetalleOpen, setParcelaDetalleOpen] = useState(false);
+  const [parcelaDetalle, setParcelaDetalle] = useState(null);
+  const [parcelaForm, setParcelaForm] = useState({
+    nombre: '',
+    hectareas: '',
+    cultivo: '',
+    estado: 'En preparación',
+    inversion: '',
+  });
+  const [deleteParcelaId, setDeleteParcelaId] = useState(null);
 
   // Modales: trabajadores
   const [trabajadorModalOpen, setTrabajadorModalOpen] = useState(false);
@@ -117,6 +131,18 @@ const CropManagementDashboard = () => {
     proximoRiego: new Date().toISOString().slice(0, 10),
   });
   const [deleteRiegoId, setDeleteRiegoId] = useState(null);
+
+  // Modales: fertilizantes
+  const [fertilizanteModalOpen, setFertilizanteModalOpen] = useState(false);
+  const [fertilizanteEditing, setFertilizanteEditing] = useState(null);
+  const [fertilizanteForm, setFertilizanteForm] = useState({
+    parcela: '',
+    fertilizante: '',
+    dosis: '',
+    fecha: new Date().toISOString().slice(0, 10),
+    estado: 'Aplicado',
+  });
+  const [deleteFertilizanteId, setDeleteFertilizanteId] = useState(null);
 
   // Modales: campanas
   const [campanaModalOpen, setCampanaModalOpen] = useState(false);
@@ -261,6 +287,67 @@ const CropManagementDashboard = () => {
     setMaquinariaEditing(null);
     setMaquinariaForm({ nombre: '', tipo: '', estado: 'Operativo', ultimoMantenimiento: '', proximoMantenimiento: '' });
     setMaquinariaModalOpen(true);
+  };
+
+  const handleAddParcela = () => {
+    setParcelaEditing(null);
+    setParcelaForm({
+      nombre: '',
+      hectareas: '',
+      cultivo: '',
+      estado: 'En preparación',
+      inversion: '',
+    });
+    setParcelaModalOpen(true);
+  };
+
+  const handleViewParcela = (parcela) => {
+    setParcelaDetalle(parcela);
+    setParcelaDetalleOpen(true);
+  };
+
+  const handleEditParcela = (parcela) => {
+    setParcelaEditing(parcela);
+    setParcelaForm({
+      nombre: parcela.nombre || '',
+      hectareas: String(parcela.hectareas ?? ''),
+      cultivo: parcela.cultivo || '',
+      estado: parcela.estado || 'En preparación',
+      inversion: String(parcela.inversion ?? ''),
+    });
+    setParcelaModalOpen(true);
+  };
+
+  const handleDeleteParcela = (id) => {
+    setDeleteParcelaId(id);
+  };
+
+  const submitParcela = async () => {
+    const payload = {
+      nombre: parcelaForm.nombre,
+      hectareas: Number(parcelaForm.hectareas) || 0,
+      cultivo: parcelaForm.cultivo,
+      estado: parcelaForm.estado || 'En preparación',
+      inversion: Number(parcelaForm.inversion) || 0,
+    };
+
+    if (parcelaEditing) {
+      const updated = await actualizarParcela(parcelaEditing.id, payload);
+      setParcelas((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    } else {
+      const created = await crearParcela(payload);
+      setParcelas((prev) => [created, ...prev]);
+    }
+
+    setParcelaModalOpen(false);
+    setParcelaEditing(null);
+  };
+
+  const confirmDeleteParcela = async () => {
+    if (!deleteParcelaId) return;
+    await eliminarParcela(deleteParcelaId);
+    setParcelas((prev) => prev.filter((p) => p.id !== deleteParcelaId));
+    setDeleteParcelaId(null);
   };
 
   const handleEditMaquinaria = (item) => {
@@ -450,6 +537,60 @@ const CropManagementDashboard = () => {
     setDeleteRiegoId(null);
   };
 
+  const handleAddFertilizante = () => {
+    setFertilizanteEditing(null);
+    setFertilizanteForm({
+      parcela: '',
+      fertilizante: '',
+      dosis: '',
+      fecha: new Date().toISOString().slice(0, 10),
+      estado: 'Aplicado',
+    });
+    setFertilizanteModalOpen(true);
+  };
+
+  const handleEditFertilizante = (item) => {
+    setFertilizanteEditing(item);
+    setFertilizanteForm({
+      parcela: item.parcela || '',
+      fertilizante: item.fertilizante || item.nombre || '',
+      dosis: item.dosis || item.cantidad || '',
+      fecha: item.fecha || item.fechaAplicacion || new Date().toISOString().slice(0, 10),
+      estado: item.estado || 'Aplicado',
+    });
+    setFertilizanteModalOpen(true);
+  };
+
+  const handleDeleteFertilizante = (id) => {
+    setDeleteFertilizanteId(id);
+  };
+
+  const submitFertilizante = async () => {
+    const payload = {
+      parcela: fertilizanteForm.parcela,
+      fertilizante: fertilizanteForm.fertilizante,
+      dosis: fertilizanteForm.dosis,
+      fecha: fertilizanteForm.fecha,
+      estado: fertilizanteForm.estado || 'Aplicado',
+    };
+
+    if (fertilizanteEditing) {
+      setFertilizantes((prev) => prev.map((f) => (f.id === fertilizanteEditing.id ? { ...f, ...payload } : f)));
+    } else {
+      const nuevo = { id: Date.now(), ...payload };
+      setFertilizantes((prev) => [nuevo, ...prev]);
+    }
+
+    setFertilizanteModalOpen(false);
+    setFertilizanteEditing(null);
+  };
+
+  const confirmDeleteFertilizante = () => {
+    if (!deleteFertilizanteId) return;
+    setFertilizantes((prev) => prev.filter((f) => f.id !== deleteFertilizanteId));
+    setDeleteFertilizanteId(null);
+  };
+
   const handleAddCampana = () => {
     setCampanaEditing(null);
     setCampanaForm({
@@ -552,7 +693,14 @@ const CropManagementDashboard = () => {
           />
         );
       case 'parcelas':
-        return <ParcelasGrid parcelas={parcelas} />;
+        return (
+          <ParcelasGrid
+            parcelas={parcelas}
+            onAdd={handleAddParcela}
+            onEdit={handleEditParcela}
+            onView={handleViewParcela}
+          />
+        );
       case 'semillas':
         return (
           <SemillasTable
@@ -581,7 +729,14 @@ const CropManagementDashboard = () => {
           />
         );
       case 'fertilizantes':
-        return <FertilizantesTable fertilizantes={fertilizantes} />;
+        return (
+          <FertilizantesTable
+            fertilizantes={fertilizantes}
+            onAdd={handleAddFertilizante}
+            onEdit={handleEditFertilizante}
+            onDelete={handleDeleteFertilizante}
+          />
+        );
       case 'reportes':
         return <ReportesGrid />;
       default:
@@ -615,6 +770,326 @@ const CropManagementDashboard = () => {
           {renderContent()}
         </div>
       </div>
+
+      {parcelaDetalleOpen && parcelaDetalle && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">Detalles de la parcela</h3>
+            <div className="am-modal-body">
+              <div className="am-modal-row">
+                <label>Nombre</label>
+                <p>{parcelaDetalle.nombre}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Hectáreas</label>
+                <p>{parcelaDetalle.hectareas ?? 0} ha</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Cultivo actual</label>
+                <p>{parcelaDetalle.cultivo || 'Sin definir'}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Estado</label>
+                <p>{parcelaDetalle.estado || 'En preparación'}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Inversión</label>
+                <p>${'{'}Number(parcelaDetalle.inversion || 0).toLocaleString(){'}'}</p>
+              </div>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-primary"
+                onClick={() => {
+                  setParcelaDetalleOpen(false);
+                  setParcelaDetalle(null);
+                }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {fertilizanteModalOpen && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">{fertilizanteEditing ? 'Editar aplicación de fertilizante' : 'Nueva aplicación de fertilizante'}</h3>
+            <div className="am-modal-body">
+              <div className="am-modal-row">
+                <label>Parcela</label>
+                <input
+                  value={fertilizanteForm.parcela}
+                  onChange={(e) => setFertilizanteForm({ ...fertilizanteForm, parcela: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Fertilizante</label>
+                <input
+                  value={fertilizanteForm.fertilizante}
+                  onChange={(e) => setFertilizanteForm({ ...fertilizanteForm, fertilizante: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Dosis</label>
+                <input
+                  value={fertilizanteForm.dosis}
+                  onChange={(e) => setFertilizanteForm({ ...fertilizanteForm, dosis: e.target.value })}
+                  placeholder="Ej: 2000 kg, 150 L/ha"
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Fecha de aplicación</label>
+                <input
+                  type="date"
+                  value={fertilizanteForm.fecha}
+                  onChange={(e) => setFertilizanteForm({ ...fertilizanteForm, fecha: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Estado</label>
+                <select
+                  value={fertilizanteForm.estado}
+                  onChange={(e) => setFertilizanteForm({ ...fertilizanteForm, estado: e.target.value })}
+                >
+                  <option value="Aplicado">Aplicado</option>
+                  <option value="Programado">Programado</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+              </div>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-ghost"
+                onClick={() => {
+                  setFertilizanteModalOpen(false);
+                  setFertilizanteEditing(null);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="am-btn am-btn-primary"
+                onClick={submitFertilizante}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {campanaModalOpen && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">{campanaEditing ? 'Editar campaña' : 'Nueva campaña'}</h3>
+            <div className="am-modal-body">
+              <div className="am-modal-row">
+                <label>Nombre de la campaña</label>
+                <input
+                  value={campanaForm.nombre}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, nombre: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Fecha de inicio</label>
+                <input
+                  type="date"
+                  value={campanaForm.fechaInicio}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, fechaInicio: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Fecha de fin</label>
+                <input
+                  type="date"
+                  value={campanaForm.fechaFin}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, fechaFin: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Hectáreas</label>
+                <input
+                  type="number"
+                  value={campanaForm.hectareas}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, hectareas: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Lotes</label>
+                <input
+                  type="number"
+                  value={campanaForm.lotes}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, lotes: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Inversión total</label>
+                <input
+                  type="number"
+                  value={campanaForm.inversionTotal}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, inversionTotal: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Gastos operativos</label>
+                <input
+                  type="number"
+                  value={campanaForm.gastosOperativos}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, gastosOperativos: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Ingreso total</label>
+                <input
+                  type="number"
+                  value={campanaForm.ingresoTotal}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, ingresoTotal: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Rendimiento por ha</label>
+                <input
+                  type="number"
+                  value={campanaForm.rendimientoHa}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, rendimientoHa: e.target.value })}
+                  placeholder="t/ha"
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Producción total</label>
+                <input
+                  type="number"
+                  value={campanaForm.produccionTotal}
+                  onChange={(e) => setCampanaForm({ ...campanaForm, produccionTotal: e.target.value })}
+                  placeholder="t"
+                />
+              </div>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-ghost"
+                onClick={() => {
+                  setCampanaModalOpen(false);
+                  setCampanaEditing(null);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="am-btn am-btn-primary"
+                onClick={submitCampana}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {parcelaModalOpen && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">{parcelaEditing ? 'Editar parcela' : 'Nueva parcela'}</h3>
+            <div className="am-modal-body">
+              <div className="am-modal-row">
+                <label>Nombre de la parcela</label>
+                <input
+                  value={parcelaForm.nombre}
+                  onChange={(e) => setParcelaForm({ ...parcelaForm, nombre: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Hectáreas</label>
+                <input
+                  type="number"
+                  value={parcelaForm.hectareas}
+                  onChange={(e) => setParcelaForm({ ...parcelaForm, hectareas: e.target.value })}
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Cultivo actual</label>
+                <input
+                  value={parcelaForm.cultivo}
+                  onChange={(e) => setParcelaForm({ ...parcelaForm, cultivo: e.target.value })}
+                  placeholder="Ej: Maíz, Soja, Trigo"
+                />
+              </div>
+              <div className="am-modal-row">
+                <label>Estado</label>
+                <select
+                  value={parcelaForm.estado}
+                  onChange={(e) => setParcelaForm({ ...parcelaForm, estado: e.target.value })}
+                >
+                  <option value="En preparación">En preparación</option>
+                  <option value="Activa">Activa</option>
+                  <option value="Cosechada">Cosechada</option>
+                </select>
+              </div>
+              <div className="am-modal-row">
+                <label>Inversión inicial</label>
+                <input
+                  type="number"
+                  value={parcelaForm.inversion}
+                  onChange={(e) => setParcelaForm({ ...parcelaForm, inversion: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-ghost"
+                onClick={() => {
+                  setParcelaModalOpen(false);
+                  setParcelaEditing(null);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="am-btn am-btn-primary"
+                onClick={submitParcela}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteParcelaId && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">Eliminar parcela</h3>
+            <div className="am-modal-body">
+              <p>¿Seguro que deseas eliminar esta parcela?</p>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-ghost"
+                onClick={() => setDeleteParcelaId(null)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="am-btn am-btn-danger"
+                onClick={confirmDeleteParcela}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {maquinariaModalOpen && (
         <div className="am-modal-backdrop">

@@ -4,47 +4,13 @@ const colorEstado = (estado) => ({
   'Cosechada': 'am-muted',
 }[estado] || 'am-muted');
 
-import { useEffect, useState } from 'react';
-import { fetchParcelas, crearParcela } from '../../services/api.js';
-
-const ParcelasGrid = () => {
-  const [parcelas, setParcelas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const cargar = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchParcelas();
-      setParcelas(data);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    cargar();
-  }, []);
-
-  const handleCrear = async () => {
-    try {
-      const nueva = await crearParcela({ nombre: `Parcela ${Date.now()}`, hectareas: 1, cultivo: 'Pendiente', estado: 'En preparación', inversion: 0 });
-      setParcelas([nueva, ...parcelas]);
-    } catch (e) {
-      alert(e.message);
-    }
-  };
-
-  if (loading) return <p>Cargando parcelas...</p>;
-  if (error) return <p>Error: {error}</p>;
+const ParcelasGrid = ({ parcelas = [], onAdd, onEdit, onView }) => {
 
   return (
     <div className="am-space-6">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}} className="mb-6">
         <h2 className="am-section-title">Gestión de Parcelas</h2>
-        <button onClick={handleCrear} className="am-badge am-success" style={{cursor:'pointer'}}>+ Nueva Parcela</button>
+        <button onClick={onAdd} className="am-badge am-success" style={{cursor:'pointer'}}>+ Nueva Parcela</button>
       </div>
       <div className="am-grid am-grid-2-md">
         {parcelas.map((parcela) => (
@@ -65,8 +31,20 @@ const ParcelasGrid = () => {
             </div>
             <p style={{fontSize:'14px',color:'#475569',marginBottom:'12px'}}><span style={{fontWeight:600}}>Cultivo actual:</span> {parcela.cultivo || 'Sin definir'}</p>
             <div style={{display:'flex',gap:'12px'}}>
-              <button className="am-badge am-success" style={{flex:1,cursor:'pointer'}}>Ver detalles</button>
-              <button className="am-badge am-muted" style={{flex:1,cursor:'pointer'}}>Editar</button>
+              <button
+                className="am-badge am-success"
+                style={{flex:1,cursor:'pointer'}}
+                onClick={onView ? () => onView(parcela) : undefined}
+              >
+                Ver detalles
+              </button>
+              <button
+                className="am-badge am-muted"
+                style={{flex:1,cursor:'pointer'}}
+                onClick={onEdit ? () => onEdit(parcela) : undefined}
+              >
+                Editar
+              </button>
             </div>
           </div>
         ))}
