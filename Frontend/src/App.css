@@ -516,18 +516,32 @@
 
 @media (max-width: 640px) {
   .login-page {
-    align-items: flex-start;
-    padding: 16px 8px 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
   }
 
   .login-main {
-    max-width: 100%;
-    padding: 0 12px;
+    max-width: 380px;
+    width: 100%;
+    padding: 0;
   }
 
   .login-card {
-    padding: 22px 16px 20px;
+    padding: 24px 18px 22px;
     border-radius: 20px;
+    max-width: 100%;
+    width: 100%;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.45);
+  }
+
+  .login-helper {
+    display: none;
+  }
+
+  .login-form {
+    max-width: none;
+    margin: 8px 0 0;
   }
 
    .login-header {

@@ -16,7 +16,7 @@
 }
 
 /* Layout base */
-body{background:var(--slate-50);color:var(--slate-800);margin:0}
+body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidden}
 .am-container{max-width:1120px;margin:0 auto;padding:16px;}
 .am-space-6>*+*{margin-top:24px;}
 .mb-6{margin-bottom:24px;}
@@ -98,9 +98,9 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0}
 .am-actions .danger{color:var(--red-600)}
 .am-actions .success{color:var(--green-600)}
 
-/* Responsive tables: scroll horizontal en pantallas pequeñas */
-.am-table-wrapper{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.am-table-wrapper .am-table{min-width:640px}
+/* Tablas: ocupar siempre el ancho disponible sin scroll horizontal */
+.am-table-wrapper{width:100%;overflow-x:hidden}
+.am-table-wrapper .am-table{min-width:100%;table-layout:auto}
 
 /* Ajustes para móviles pequeños */
 @media(max-width:640px){

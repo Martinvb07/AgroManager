@@ -5,6 +5,16 @@ import jsPDF from 'jspdf';
 import { actualizarCampana, crearCampanaDia, eliminarCampanaDia, fetchCampana, fetchCampanaDiario, actualizarCampanaDia, fetchRemisiones, crearRemision, actualizarRemision, eliminarRemision } from '../services/api.js';
 import { campanas as mockCampanas } from '../services/mockData.js';
 
+const normalizeDateInput = (value) => {
+  if (!value) return new Date().toISOString().slice(0, 10);
+  // Acepta tanto 'YYYY-MM-DD' como ISO completo 'YYYY-MM-DDTHH:mm:ss.sssZ'
+  const d = new Date(value);
+  if (!Number.isNaN(d.getTime())) {
+    return d.toISOString().slice(0, 10);
+  }
+  return String(value).slice(0, 10);
+};
+
 const CampanaDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -52,8 +62,8 @@ const CampanaDetail = () => {
         setCampana(data);
         setForm({
           nombre: data.nombre || '',
-          fechaInicio: data.fechaInicio || new Date().toISOString().slice(0, 10),
-          fechaFin: data.fechaFin || new Date().toISOString().slice(0, 10),
+          fechaInicio: normalizeDateInput(data.fechaInicio),
+          fechaFin: normalizeDateInput(data.fechaFin),
           hectareas: String(data.hectareas ?? ''),
           lotes: String(data.lotes ?? ''),
           inversionTotal: String(data.inversionTotal ?? ''),
@@ -72,7 +82,11 @@ const CampanaDetail = () => {
 
         try {
           const rems = await fetchRemisiones(id);
-          setRemisiones(rems || []);
+          // Normalizamos la fecha para evitar problemas con inputs type="date"
+          setRemisiones((rems || []).map((r) => ({
+            ...r,
+            fecha: normalizeDateInput(r.fecha),
+          })));
         } catch {
           setRemisiones([]);
         }
@@ -82,8 +96,8 @@ const CampanaDetail = () => {
           setCampana(fallback);
           setForm({
             nombre: fallback.nombre || '',
-            fechaInicio: fallback.fechaInicio || new Date().toISOString().slice(0, 10),
-            fechaFin: fallback.fechaFin || new Date().toISOString().slice(0, 10),
+            fechaInicio: normalizeDateInput(fallback.fechaInicio),
+            fechaFin: normalizeDateInput(fallback.fechaFin),
             hectareas: String(fallback.hectareas ?? ''),
             lotes: String(fallback.lotes ?? ''),
             inversionTotal: String(fallback.inversionTotal ?? ''),
@@ -174,7 +188,7 @@ const CampanaDetail = () => {
   const handleEditDiario = (entry) => {
     setDiarioForm({
       id: entry.id,
-      fecha: entry.fecha || new Date().toISOString().slice(0, 10),
+      fecha: normalizeDateInput(entry.fecha),
       hectareas: String(entry.hectareas ?? ''),
       bultos: String(entry.bultos ?? ''),
       notas: entry.notas || '',
@@ -241,7 +255,7 @@ const CampanaDetail = () => {
   const handleEditRemision = (r) => {
     setRemisionForm({
       id: r.id,
-      fecha: r.fecha || new Date().toISOString().slice(0, 10),
+      fecha: normalizeDateInput(r.fecha),
       nombreConductor: r.nombreConductor || '',
       ccConductor: r.ccConductor || '',
       vehiculoPlaca: r.vehiculoPlaca || '',
