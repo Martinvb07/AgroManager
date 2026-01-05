@@ -100,8 +100,9 @@ body{
    ========================================================= */
 
 .cambios-panel{
-  max-width:960px;
-  margin:0 auto;
+  width:100%;
+  max-width:none;
+  margin:0;
   background:linear-gradient(180deg,#020617,#020617);
   border-radius:28px;
   padding:22px;
