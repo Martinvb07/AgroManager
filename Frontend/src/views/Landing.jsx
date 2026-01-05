@@ -54,8 +54,8 @@ const Landing = () => {
             <nav className="landing-nav-links">
               <a href="#que-es">Solución</a>
               <a href="#modulos">Módulos</a>
-              <a href="#precios" className="landing-nav-pill">Precios (pronto)</a>
-              <Link to="/cambios" className="landing-nav-pill landing-nav-pill-secondary">Cambios</Link>
+              <a href="#precios">Precios (pronto)</a>
+              <Link to="/cambios">Cambios</Link>
             </nav>
           </div>
           <Link to="/login" className="landing-nav-login">

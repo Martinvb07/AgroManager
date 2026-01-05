@@ -43,12 +43,12 @@
   letter-spacing: 0.05em;
   font-size: 18px;
 }
-
+ 
 .landing-nav-links {
-  display: none;
+  display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 13px;
+  gap: 16px;
+  font-size: 14px;
 }
 
 .landing-nav-links a {
@@ -59,18 +59,25 @@
 
 .landing-nav-links a:hover {
   opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .landing-nav-pill {
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.38);
-  font-size: 11px;
+  border: 1px solid rgba(236, 253, 245, 0.5);
+  background: rgba(15, 23, 42, 0.18);
+  font-size: 12px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .landing-nav-pill-secondary {
-  background: rgba(15, 23, 42, 0.16);
-  border: 1px solid rgba(15, 23, 42, 0.35);
+  border-color: rgba(236, 253, 245, 0.35);
+  background: transparent;
 }
 
 .landing-nav-login {
@@ -271,6 +278,49 @@
 }
 
 /* Lista de cambios en la página /cambios */
+.cambios-panel {
+  margin-top: 24px;
+  padding: 18px 18px 20px;
+  border-radius: 22px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(15, 23, 42, 0.85);
+}
+
+.cambios-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.cambios-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.cambios-filter {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5f9f0;
+  font-size: 12px;
+  cursor: default;
+}
+
+.cambios-filter.is-active {
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+}
+
+.cambios-toolbar-link {
+  font-size: 12px;
+  color: #c4d7ff;
+  cursor: default;
+}
+
 .cambios-list {
   list-style: none;
   padding: 0;
@@ -280,10 +330,28 @@
 }
 
 .cambio-item {
-  background: rgba(15, 23, 42, 0.9);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+  border-radius: 18px;
+  padding: 14px 18px;
+}
+
+.cambio-icon {
+  width: 40px;
+  height: 40px;
   border-radius: 14px;
-  padding: 14px 16px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 0 0, #4ade80, #22c55e);
+  font-size: 20px;
+}
+
+.cambio-content {
+  min-width: 0;
 }
 
 .cambio-item-header {
@@ -297,12 +365,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #e5f9f0;
-}
-
-.cambio-date {
-  font-size: 12px;
-  color: #a5b4fc;
+  color: #f9fafb;
 }
 
 .cambio-desc {
@@ -315,6 +378,28 @@
   margin: 0;
   font-size: 12px;
   color: #9ca3af;
+}
+
+.cambio-side-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.cambio-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(0, 255, 148, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  font-weight: 600;
+}
+
+.cambio-date {
+  font-size: 12px;
+  color: #a5b4fc;
 }
 
 .landing-actions {

@@ -50,7 +50,7 @@ const Cambios = () => {
             <p className="landing-pill">Historial de cambios</p>
             <h1 className="landing-title">Qué ha cambiado en AgroManager</h1>
             <p className="landing-subtitle">
-              Aquí verás los ajustes y mejoras que el dueño de la app va publicando para mantenerte al día.
+              Ajustes, mejoras y nuevas funciones publicados por el dueño de la app para mantenerte al día.
             </p>
           </div>
         </div>
@@ -66,25 +66,43 @@ const Cambios = () => {
           )}
 
           {!loading && !error && cambios.length > 0 && (
-            <ul className="cambios-list">
-              {cambios.map((cambio) => {
-                const fecha = cambio.created_at
-                  ? new Date(cambio.created_at).toLocaleDateString('es-CO')
-                  : '';
-                return (
-                  <li key={cambio.id} className="cambio-item">
-                    <div className="cambio-item-header">
-                      <h2 className="cambio-title">{cambio.titulo}</h2>
-                      {fecha && <span className="cambio-date">{fecha}</span>}
-                    </div>
-                    <p className="cambio-desc">{cambio.descripcion}</p>
-                    {cambio.creado_por && (
-                      <p className="cambio-meta">Publicado por {cambio.creado_por}</p>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="cambios-panel">
+              <div className="cambios-toolbar">
+                <div className="cambios-filters">
+                  <button type="button" className="cambios-filter is-active">Todo</button>
+                  <button type="button" className="cambios-filter">Novedad</button>
+                  <button type="button" className="cambios-filter">Mejora</button>
+                  <button type="button" className="cambios-filter">Corrección</button>
+                </div>
+                <span className="cambios-toolbar-link">Ver historial completo ▸</span>
+              </div>
+
+              <ul className="cambios-list">
+                {cambios.map((cambio) => {
+                  const fecha = cambio.created_at
+                    ? new Date(cambio.created_at).toLocaleDateString('es-CO')
+                    : '';
+                  return (
+                    <li key={cambio.id} className="cambio-item">
+                      <div className="cambio-icon" aria-hidden="true">🔔</div>
+                      <div className="cambio-content">
+                        <div className="cambio-item-header">
+                          <h2 className="cambio-title">{cambio.titulo}</h2>
+                        </div>
+                        <p className="cambio-desc">{cambio.descripcion}</p>
+                        {cambio.creado_por && (
+                          <p className="cambio-meta">Publicado por {cambio.creado_por}</p>
+                        )}
+                      </div>
+                      <div className="cambio-side-meta">
+                        <span className="cambio-badge">Nuevo</span>
+                        {fecha && <span className="cambio-date">{fecha}</span>}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           )}
         </section>
       </main>
