@@ -51,8 +51,8 @@ const Cambios = () => {
   }, []);
 
   return (
-    <div className="landing-page" style={{ minHeight: '100vh' }}>
-      <header className="landing-header shell-inner">
+    <div className="landing-page cambios-page" style={{ minHeight: '100vh' }}>
+      <header className="landing-header shell-inner shell-inner--wide">
         <div className="landing-nav">
           <div className="landing-nav-left">
             <Link to="/" className="landing-logo" style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -79,7 +79,7 @@ const Cambios = () => {
         </div>
       </header>
 
-      <main className="landing-main shell-inner">
+      <main className="landing-main shell-inner shell-inner--wide">
         <section className="landing-section">
           {loading && <p className="landing-text">Cargando cambios...</p>}
           {error && <p className="landing-text">{error}</p>}

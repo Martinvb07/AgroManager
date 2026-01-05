@@ -12,6 +12,11 @@
   margin: 0 auto;
 }
 
+/* Variante más ancha para páginas que lo requieren (ej: /cambios) */
+.shell-inner--wide {
+  max-width: 1280px;
+}
+
 /* Landing */
 .landing-page {
   min-height: 100vh;
@@ -259,6 +264,19 @@
   flex: 1;
   background: transparent;
   padding: 32px 16px 40px;
+}
+
+/* Ajustes para /cambios: panel más grande y menos espacio vacío */
+.cambios-page .landing-header {
+  padding-bottom: 20px;
+}
+
+.cambios-page .landing-main {
+  padding-top: 14px;
+}
+
+.cambios-page .cambios-panel {
+  margin-top: 14px;
 }
 
 /* Aviso compacto de cambios en la landing */
@@ -999,6 +1017,10 @@
 
   .shell-inner {
     max-width: 1200px;
+  }
+
+  .shell-inner--wide {
+    max-width: 1400px;
   }
 
   .landing-header {
