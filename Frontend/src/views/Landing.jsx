@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Tractor, ShieldCheck } from 'lucide-react';
+import { fetchCambios } from '../services/api.js';
 
 const Landing = () => {
   const slides = [
@@ -25,6 +26,7 @@ const Landing = () => {
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [cambios, setCambios] = useState([]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -32,6 +34,16 @@ const Landing = () => {
     }, 4500);
     return () => clearInterval(id);
   }, [slides.length]);
+
+  useEffect(() => {
+    fetchCambios(3)
+      .then((data) => {
+        setCambios(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        setCambios([]);
+      });
+  }, []);
 
   return (
     <div className="landing-page">
@@ -42,7 +54,7 @@ const Landing = () => {
             <nav className="landing-nav-links">
               <a href="#que-es">Solución</a>
               <a href="#modulos">Módulos</a>
-              <span className="landing-nav-pill">Precios (pronto)</span>
+              <a href="#precios" className="landing-nav-pill">Precios (pronto)</a>
             </nav>
           </div>
           <Link to="/login" className="landing-nav-login">
@@ -57,18 +69,7 @@ const Landing = () => {
             <p className="landing-subtitle">
               Visualiza parcelas, personal, riego y finanzas en tiempo real. Toma decisiones con datos, no con intuición.
             </p>
-            <div className="landing-actions landing-actions-inline">
-              <Link to="/login" className="landing-btn-primary">
-                Iniciar sesión como administrador
-              </Link>
-              <a href="#que-es" className="landing-btn-secondary">
-                Ver cómo funciona
-              </a>
-            </div>
-            <div className="landing-hero-meta">
-              <span>✅ Pensado para equipos en terreno</span>
-              <span>✅ Funciona perfecto en móvil</span>
-            </div>
+            {/* Botones principales removidos a petición: el acceso sigue estando en el header */}
           </div>
 
           <div className="landing-hero-card landing-carousel" aria-label="Muestra del panel AgroManager">
@@ -158,6 +159,85 @@ const Landing = () => {
           </div>
         </section>
 
+        {Array.isArray(cambios) && cambios.length > 0 && (
+          <section className="landing-section">
+            <h2 className="landing-section-title">Novedades recientes en AgroManager</h2>
+            <ul className="landing-list">
+              {cambios.map((cambio) => {
+                const fecha = cambio.created_at
+                  ? new Date(cambio.created_at).toLocaleDateString('es-CO')
+                  : '';
+                return (
+                  <li key={cambio.id}>
+                    <strong>{cambio.titulo}</strong>
+                    <br />
+                    <span>{cambio.descripcion}</span>
+                    {fecha && (
+                      <span style={{ display: 'block', fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                        {`Publicado el ${fecha}`}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
+
+        <section id="precios" className="landing-section pricing-section">
+          <h2 className="pricing-title">Planes y precios</h2>
+          <p className="pricing-subtitle">
+            Elige la forma de usar AgroManager que mejor se adapte a tu campo.
+          </p>
+
+          <div className="pricing-grid">
+            <article className="pricing-card">
+              <h3 className="pricing-plan-name">Plan Básico Mensual</h3>
+              <p className="pricing-price-line">
+                <span className="pricing-currency">$</span>
+                <span className="pricing-amount">70.000</span>
+                <span className="pricing-period">COP/mes</span>
+              </p>
+              <p className="pricing-description">
+                Suscripción mensual a AgroManager para gestionar lotes, cultivos y costos de producción desde la nube.
+              </p>
+              <ul className="pricing-features">
+                <li>Gestión de lotes y cultivos</li>
+                <li>Registro de labores y actividades</li>
+                <li>Control básico de insumos y costos</li>
+                <li>Reportes de rendimientos por cultivo</li>
+                <li>Acceso multiusuario</li>
+              </ul>
+              <button type="button" className="pricing-cta-btn">
+                Hablar con ventas
+              </button>
+            </article>
+
+            <article className="pricing-card pricing-card-featured">
+              <div className="pricing-badge">Más popular</div>
+              <h3 className="pricing-plan-name">Licencia Única (pago único)</h3>
+              <p className="pricing-price-line">
+                <span className="pricing-currency">$</span>
+                <span className="pricing-amount">840.000</span>
+                <span className="pricing-period">Pago único</span>
+              </p>
+              <p className="pricing-description">
+                Compra única de la licencia de AgroManager para tu finca o empresa agrícola, con 1 año de soporte y actualizaciones.
+              </p>
+              <ul className="pricing-features">
+                <li>Pago único por licencia (sin mensualidades)</li>
+                <li>Uso ilimitado del sistema para tu operación agrícola</li>
+                <li>Todas las funcionalidades del sistema AgroManager</li>
+                <li>1 año de soporte y mantenimiento incluido</li>
+                <li>Actualizaciones durante el primer año sin costo</li>
+              </ul>
+              <button type="button" className="pricing-cta-btn pricing-cta-btn-primary">
+                Hablar con ventas
+              </button>
+            </article>
+          </div>
+        </section>
+
         <section className="landing-section landing-bottom-callout">
           <div>
             <h2 className="landing-section-title">Pensado para el campo real</h2>
@@ -165,9 +245,6 @@ const Landing = () => {
               Interfaz sencilla, optimizada para móviles y conexiones inestables. Tus datos quedan seguros en la nube y disponibles para todo el equipo.
             </p>
           </div>
-          <Link to="/login" className="landing-btn-primary landing-bottom-cta">
-            Probar el panel de administración
-          </Link>
         </section>
       </main>
     </div>

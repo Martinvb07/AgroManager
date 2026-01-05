@@ -194,6 +194,28 @@ export async function eliminarRemision(campanaId, remisionId) {
   return true;
 }
 
+// --- Cambios / Novedades ---
+
+export async function fetchCambios(limit) {
+  let path = '/cambios';
+  if (typeof limit === 'number' && Number.isFinite(limit) && limit > 0) {
+    const params = new URLSearchParams();
+    params.append('limit', String(limit));
+    path += `?${params.toString()}`;
+  }
+
+  const json = await request(path);
+  return json.data;
+}
+
+export async function crearCambio(payload) {
+  const json = await request('/cambios', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return json.data;
+}
+
 // --- Maquinaria ---
 
 export async function fetchMaquinaria() {

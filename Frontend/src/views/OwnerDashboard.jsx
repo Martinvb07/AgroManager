@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchUsuarios, crearUsuario } from '../services/api.js';
+import { fetchUsuarios, crearUsuario, crearCambio, fetchCambios } from '../services/api.js';
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
@@ -9,6 +9,12 @@ const OwnerDashboard = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Cambios / novedades que verá la gente en la landing
+  const [cambios, setCambios] = useState([]);
+  const [cambioForm, setCambioForm] = useState({ titulo: '', descripcion: '' });
+  const [cambioError, setCambioError] = useState('');
+  const [cambioGuardando, setCambioGuardando] = useState(false);
 
   const loadUsers = async () => {
     try {
@@ -19,6 +25,16 @@ const OwnerDashboard = () => {
       setError(e.message || 'No se pudieron cargar los usuarios');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCambios = async () => {
+    try {
+      const data = await fetchCambios(5);
+      setCambios(Array.isArray(data) ? data : []);
+    } catch (e) {
+      // No romper el panel del dueño si falla esto
+      console.error('Error cargando cambios', e);
     }
   };
 
@@ -37,6 +53,7 @@ const OwnerDashboard = () => {
     }
 
     loadUsers();
+    loadCambios();
   }, []);
 
   const handleChange = (e) => {
@@ -61,6 +78,31 @@ const OwnerDashboard = () => {
       setSuccess('Usuario creado correctamente');
     } catch (e) {
       setError(e.message || 'No se pudo crear el usuario');
+    }
+  };
+
+  const handleCambioSubmit = async (e) => {
+    e.preventDefault();
+    setCambioError('');
+
+    const titulo = (cambioForm.titulo || '').trim();
+    const descripcion = (cambioForm.descripcion || '').trim();
+
+    if (!titulo || !descripcion) {
+      setCambioError('Completa título y descripción antes de publicar.');
+      return;
+    }
+
+    try {
+      setCambioGuardando(true);
+      const nuevo = await crearCambio({ titulo, descripcion });
+      setCambios((prev) => [nuevo, ...prev].slice(0, 5));
+      setCambioForm({ titulo: '', descripcion: '' });
+    } catch (e) {
+      console.error('Error creando cambio', e);
+      setCambioError('No se pudo publicar el cambio. Intenta de nuevo.');
+    } finally {
+      setCambioGuardando(false);
     }
   };
 
@@ -169,6 +211,73 @@ const OwnerDashboard = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+        </section>
+
+        <section className="admin-card mt-8">
+          <h2 className="section-title">Cambios y novedades (landing)</h2>
+          <p className="admin-subtitle" style={{ marginTop: 4 }}>
+            Todo lo que publiques aquí se mostrará en la landing pública como cambios recientes de AgroManager.
+          </p>
+
+          <form className="grid gap-4" onSubmit={handleCambioSubmit}>
+            <div>
+              <label className="login-field-label">Título del cambio</label>
+              <input
+                value={cambioForm.titulo}
+                onChange={(e) => setCambioForm({ ...cambioForm, titulo: e.target.value })}
+                className="login-input"
+                placeholder="Ej: Nuevo módulo de riego"
+              />
+            </div>
+            <div>
+              <label className="login-field-label">Descripción breve</label>
+              <textarea
+                value={cambioForm.descripcion}
+                onChange={(e) => setCambioForm({ ...cambioForm, descripcion: e.target.value })}
+                rows={3}
+                className="login-input"
+                style={{ resize: 'vertical' }}
+                placeholder="Cuenta en una o dos líneas qué se cambió."
+              />
+            </div>
+
+            {cambioError && <p className="login-error">{cambioError}</p>}
+
+            <button type="submit" className="login-button" disabled={cambioGuardando}>
+              {cambioGuardando ? 'Publicando…' : 'Publicar cambio'}
+            </button>
+          </form>
+
+          {Array.isArray(cambios) && cambios.length > 0 && (
+            <div className="mt-8">
+              <h3 className="section-title" style={{ fontSize: '1rem' }}>Últimos cambios publicados</h3>
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: 8, display: 'grid', gap: 8 }}>
+                {cambios.map((cambio) => {
+                  const fecha = cambio.created_at
+                    ? new Date(cambio.created_at).toLocaleDateString('es-CO')
+                    : '';
+                  return (
+                    <li
+                      key={cambio.id}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        border: '1px solid #e5e7eb',
+                        background: '#f9fafb',
+                      }}
+                    >
+                      <div style={{ fontWeight: 600 }}>{cambio.titulo}</div>
+                      <div style={{ fontSize: 14, marginTop: 2 }}>{cambio.descripcion}</div>
+                      <div style={{ fontSize: 12, marginTop: 4, color: '#6b7280' }}>
+                        {fecha && `Publicado el ${fecha}`}
+                        {cambio.creado_por ? ` · por ${cambio.creado_por}` : ''}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           )}
         </section>

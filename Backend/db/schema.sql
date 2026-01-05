@@ -180,6 +180,16 @@ CREATE TABLE IF NOT EXISTS remisiones (
   CONSTRAINT fk_remisiones_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- Registro de cambios y novedades visibles en la landing
+CREATE TABLE IF NOT EXISTS cambios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  titulo VARCHAR(160) NOT NULL,
+  descripcion TEXT NOT NULL,
+  creado_por INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_cambios_usuario FOREIGN KEY (creado_por) REFERENCES usuarios(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 -- Datos de ejemplo iniciales para parcelas
 INSERT INTO parcelas (nombre, hectareas, cultivo, estado, inversion) VALUES
 ('Parcela Norte A', 12.5, 'Maíz', 'Activa', 25000),

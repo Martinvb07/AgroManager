@@ -20,7 +20,39 @@ import {
   campanas as initialCampanas,
   calcularLiquidacion,
 } from '../services/mockData.js';
-import { fetchParcelas, crearParcela, actualizarParcela, eliminarParcela, fetchTrabajadores, crearTrabajador, actualizarTrabajador, eliminarTrabajador, fetchFinanzas, crearIngreso, crearEgreso, fetchMaquinaria, crearMaquinaria, actualizarMaquinaria, eliminarMaquinaria, fetchSemillas, crearSemilla, actualizarSemilla, eliminarSemilla, fetchPlagas, crearPlaga, actualizarPlaga, eliminarPlaga, fetchRiego, crearRiego, actualizarRiego, eliminarRiego, fetchCampanas, crearCampana, actualizarCampana, eliminarCampana } from '../services/api.js';
+import {
+  fetchParcelas,
+  crearParcela,
+  actualizarParcela,
+  eliminarParcela,
+  fetchTrabajadores,
+  crearTrabajador,
+  actualizarTrabajador,
+  eliminarTrabajador,
+  fetchFinanzas,
+  crearIngreso,
+  crearEgreso,
+  fetchMaquinaria,
+  crearMaquinaria,
+  actualizarMaquinaria,
+  eliminarMaquinaria,
+  fetchSemillas,
+  crearSemilla,
+  actualizarSemilla,
+  eliminarSemilla,
+  fetchPlagas,
+  crearPlaga,
+  actualizarPlaga,
+  eliminarPlaga,
+  fetchRiego,
+  crearRiego,
+  actualizarRiego,
+  eliminarRiego,
+  fetchCampanas,
+  crearCampana,
+  actualizarCampana,
+  eliminarCampana,
+} from '../services/api.js';
 
 const CropManagementDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
