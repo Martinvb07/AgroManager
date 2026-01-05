@@ -23,11 +23,10 @@ export const usuariosService = {
     // Si el valor ya parece un hash bcrypt (empieza con $2a$, $2b$ o $2y$),
     // lo usamos directo. Si no, asumimos contraseña en texto plano y la hasheamos.
     let passwordHash = password;
-    const bcryptPrefix = /^
-      \$2[aby]\$          # prefijo bcrypt
-    /x;
+    const isBcryptHash =
+      typeof password === 'string' && /^\$2[aby]\$[0-9]{2}\$/.test(password);
 
-    if (!bcryptPrefix.test(password || '')) {
+    if (!isBcryptHash) {
       passwordHash = await bcrypt.hash(password, 10);
     }
 
