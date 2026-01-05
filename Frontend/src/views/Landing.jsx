@@ -55,6 +55,7 @@ const Landing = () => {
               <a href="#que-es">Solución</a>
               <a href="#modulos">Módulos</a>
               <a href="#precios" className="landing-nav-pill">Precios (pronto)</a>
+              <Link to="/cambios" className="landing-nav-pill landing-nav-pill-secondary">Cambios</Link>
             </nav>
           </div>
           <Link to="/login" className="landing-nav-login">
@@ -69,7 +70,16 @@ const Landing = () => {
             <p className="landing-subtitle">
               Visualiza parcelas, personal, riego y finanzas en tiempo real. Toma decisiones con datos, no con intuición.
             </p>
-            {/* Botones principales removidos a petición: el acceso sigue estando en el header */}
+            {/* Aviso compacto con el último cambio publicado */}
+            {Array.isArray(cambios) && cambios.length > 0 && (
+              <div className="landing-changelog-banner">
+                <span className="landing-changelog-label">Novedad</span>
+                <span>{cambios[0].titulo}</span>
+                <Link to="/cambios" className="landing-changelog-link">
+                  Ver todos los cambios
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="landing-hero-card landing-carousel" aria-label="Muestra del panel AgroManager">
@@ -158,31 +168,6 @@ const Landing = () => {
             </article>
           </div>
         </section>
-
-        {Array.isArray(cambios) && cambios.length > 0 && (
-          <section className="landing-section">
-            <h2 className="landing-section-title">Novedades recientes en AgroManager</h2>
-            <ul className="landing-list">
-              {cambios.map((cambio) => {
-                const fecha = cambio.created_at
-                  ? new Date(cambio.created_at).toLocaleDateString('es-CO')
-                  : '';
-                return (
-                  <li key={cambio.id}>
-                    <strong>{cambio.titulo}</strong>
-                    <br />
-                    <span>{cambio.descripcion}</span>
-                    {fecha && (
-                      <span style={{ display: 'block', fontSize: 12, color: '#6b7280', marginTop: 2 }}>
-                        {`Publicado el ${fecha}`}
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        )}
 
         <section id="precios" className="landing-section pricing-section">
           <h2 className="pricing-title">Planes y precios</h2>

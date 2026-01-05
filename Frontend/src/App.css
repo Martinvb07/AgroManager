@@ -68,6 +68,11 @@
   font-size: 11px;
 }
 
+.landing-nav-pill-secondary {
+  background: rgba(15, 23, 42, 0.16);
+  border: 1px solid rgba(15, 23, 42, 0.35);
+}
+
 .landing-nav-login {
   padding: 8px 16px;
   border-radius: 999px;
@@ -214,6 +219,31 @@
   padding: 32px 16px 40px;
 }
 
+/* Aviso compacto de cambios en la landing */
+.landing-changelog-banner {
+  margin-top: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.45);
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.landing-changelog-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: #a7f3d0;
+}
+
+.landing-changelog-link {
+  color: #bfdbfe;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .landing-section {
   margin-bottom: 24px;
 }
@@ -238,6 +268,53 @@
   color: #e5f9f0;
   display: grid;
   gap: 6px;
+}
+
+/* Lista de cambios en la página /cambios */
+.cambios-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.cambio-item {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.5);
+}
+
+.cambio-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cambio-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #e5f9f0;
+}
+
+.cambio-date {
+  font-size: 12px;
+  color: #a5b4fc;
+}
+
+.cambio-desc {
+  margin: 6px 0 4px;
+  font-size: 14px;
+  color: #e5f9f0;
+}
+
+.cambio-meta {
+  margin: 0;
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .landing-actions {

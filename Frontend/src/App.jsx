@@ -5,6 +5,7 @@ import Login from './views/Login.jsx';
 import CropManagementDashboard from './views/CropManagementDashboard.jsx';
 import CampanaDetail from './views/CampanaDetail.jsx';
 import OwnerDashboard from './views/OwnerDashboard.jsx';
+import Cambios from './views/Cambios.jsx';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/owner" element={<OwnerDashboard />} />
         <Route path="/admin" element={<CropManagementDashboard />} />
         <Route path="/admin/campanas/:id" element={<CampanaDetail />} />
+        <Route path="/cambios" element={<Cambios />} />
       </Routes>
     </BrowserRouter>
   );
