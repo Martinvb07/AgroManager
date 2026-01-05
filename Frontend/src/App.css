@@ -14,7 +14,7 @@
 
 /* Variante más ancha para páginas que lo requieren (ej: /cambios) */
 .shell-inner--wide {
-  max-width: 1280px;
+  max-width: 1440px;
 }
 
 /* Landing */
@@ -334,18 +334,19 @@
 .cambios-panel {
   margin-top: 24px;
   width: 100%;
-  padding: 18px 18px 20px;
-  border-radius: 22px;
-  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
-  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(15, 23, 42, 0.85);
+  padding: 22px 22px 24px;
+  border-radius: 24px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.88));
+  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(236, 253, 245, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .cambios-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -357,7 +358,7 @@
 }
 
 .cambios-filter {
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   border: 1px solid transparent;
   background: rgba(15, 23, 42, 0.8);
@@ -393,28 +394,28 @@
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .cambio-item {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
-  border-radius: 18px;
-  padding: 14px 18px;
+  border-radius: 20px;
+  padding: 18px 22px;
 }
 
 .cambio-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at 0 0, #4ade80, #22c55e);
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .cambio-content {
@@ -430,7 +431,7 @@
 
 .cambio-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: #f9fafb;
 }
@@ -1020,7 +1021,7 @@
   }
 
   .shell-inner--wide {
-    max-width: 1400px;
+    max-width: 1600px;
   }
 
   .landing-header {
