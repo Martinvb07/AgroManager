@@ -9,6 +9,7 @@ import plagasRoutes from './plagas.routes.js';
 import riegoRoutes from './riego.routes.js';
 import campanasRoutes from './campanas.routes.js';
 import authRoutes from './auth.routes.js';
+import ownerRoutes from './owner.routes.js';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/plagas', plagasRoutes);
 router.use('/riego', riegoRoutes);
 router.use('/campanas', campanasRoutes);
 router.use('/auth', authRoutes);
+router.use('/owner', ownerRoutes);
 
 export default router;

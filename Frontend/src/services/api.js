@@ -313,3 +313,18 @@ export async function login(email, password) {
   });
   return json;
 }
+
+// --- Gestión de usuarios (solo owner) ---
+
+export async function fetchUsuarios() {
+  const json = await request('/owner/users');
+  return json.data;
+}
+
+export async function crearUsuario(payload) {
+  const json = await request('/owner/users', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return json.data;
+}

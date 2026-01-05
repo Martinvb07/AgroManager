@@ -25,7 +25,12 @@ const Login = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(data));
       }
-      navigate('/admin');
+      const role = (data?.rol || '').toString().toLowerCase();
+      if (role === 'owner') {
+        navigate('/owner');
+      } else {
+        navigate('/admin');
+      }
     } catch (err) {
       const message = err?.message || 'No se pudo iniciar sesión';
       setError(message.includes('Error') ? 'Correo o contraseña incorrectos' : message);
@@ -85,7 +90,7 @@ const Login = () => {
           </form>
         </section>
 
-        <p className="login-helper">Demo sin validación real. Más adelante se conecta con tu backend.</p>
+        <p className="login-helper">Tu sesión se valida contra el backend y el rol owner entra a un panel separado.</p>
       </main>
     </div>
   );
