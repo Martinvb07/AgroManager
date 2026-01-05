@@ -3,6 +3,24 @@ import { Link } from 'react-router-dom';
 import { MapPin, Tractor, ShieldCheck } from 'lucide-react';
 import { fetchCambios } from '../services/api.js';
 
+function normalizeTipo(raw) {
+  const value = (raw || '').toString().trim().toLowerCase();
+  if (!value) return 'novedad';
+  const plain = value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  if (plain.startsWith('mejor')) return 'mejora';
+  if (plain.startsWith('correc') || plain.startsWith('arregl') || plain.startsWith('fix')) return 'correccion';
+  return 'novedad';
+}
+
+function tipoLabel(tipo) {
+  const t = normalizeTipo(tipo);
+  if (t === 'mejora') return 'Mejora';
+  if (t === 'correccion') return 'Corrección';
+  return 'Novedad';
+}
+
 const Landing = () => {
   const slides = [
     {
@@ -73,7 +91,7 @@ const Landing = () => {
             {/* Aviso compacto con el último cambio publicado */}
             {Array.isArray(cambios) && cambios.length > 0 && (
               <div className="landing-changelog-banner">
-                <span className="landing-changelog-label">Novedad</span>
+                <span className="landing-changelog-label">{tipoLabel(cambios[0]?.tipo)}</span>
                 <span>{cambios[0].titulo}</span>
                 <Link to="/cambios" className="landing-changelog-link">
                   Ver todos los cambios

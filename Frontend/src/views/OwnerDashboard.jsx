@@ -12,7 +12,7 @@ const OwnerDashboard = () => {
 
   // Cambios / novedades que verá la gente en la landing
   const [cambios, setCambios] = useState([]);
-  const [cambioForm, setCambioForm] = useState({ titulo: '', descripcion: '' });
+  const [cambioForm, setCambioForm] = useState({ titulo: '', descripcion: '', tipo: 'novedad' });
   const [cambioError, setCambioError] = useState('');
   const [cambioGuardando, setCambioGuardando] = useState(false);
 
@@ -87,6 +87,7 @@ const OwnerDashboard = () => {
 
     const titulo = (cambioForm.titulo || '').trim();
     const descripcion = (cambioForm.descripcion || '').trim();
+    const tipo = (cambioForm.tipo || 'novedad').toString().trim().toLowerCase();
 
     if (!titulo || !descripcion) {
       setCambioError('Completa título y descripción antes de publicar.');
@@ -95,9 +96,9 @@ const OwnerDashboard = () => {
 
     try {
       setCambioGuardando(true);
-      const nuevo = await crearCambio({ titulo, descripcion });
+      const nuevo = await crearCambio({ titulo, descripcion, tipo });
       setCambios((prev) => [nuevo, ...prev].slice(0, 5));
-      setCambioForm({ titulo: '', descripcion: '' });
+      setCambioForm({ titulo: '', descripcion: '', tipo: 'novedad' });
     } catch (e) {
       console.error('Error creando cambio', e);
       setCambioError('No se pudo publicar el cambio. Intenta de nuevo.');
@@ -222,6 +223,18 @@ const OwnerDashboard = () => {
           </p>
 
           <form className="grid gap-4" onSubmit={handleCambioSubmit}>
+            <div>
+              <label className="login-field-label">Tipo</label>
+              <select
+                value={cambioForm.tipo}
+                onChange={(e) => setCambioForm({ ...cambioForm, tipo: e.target.value })}
+                className="login-input"
+              >
+                <option value="novedad">Novedad</option>
+                <option value="mejora">Mejora</option>
+                <option value="correccion">Corrección</option>
+              </select>
+            </div>
             <div>
               <label className="login-field-label">Título del cambio</label>
               <input

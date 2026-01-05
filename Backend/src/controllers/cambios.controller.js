@@ -11,7 +11,7 @@ export const cambiosController = {
   }),
 
   create: asyncHandler(async (req, res) => {
-    const { titulo, descripcion } = req.body || {};
+    const { titulo, descripcion, tipo } = req.body || {};
 
     if (!titulo || !descripcion) {
       return res.status(400).json({ message: 'titulo y descripcion son obligatorios' });
@@ -28,6 +28,7 @@ export const cambiosController = {
     const nuevoCambio = await createCambio({
       titulo: titulo.toString().trim(),
       descripcion: descripcion.toString().trim(),
+      tipo: (tipo || 'novedad').toString().trim(),
       userId: user.id,
     });
 

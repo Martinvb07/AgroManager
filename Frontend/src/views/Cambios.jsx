@@ -2,10 +2,33 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchCambios } from '../services/api.js';
 
+function normalizeTipo(raw) {
+  const value = (raw || '').toString().trim().toLowerCase();
+  if (!value) return 'novedad';
+  if (value === 'todo') return 'todo';
+  // normalizar sin tildes
+  const plain = value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  if (plain.startsWith('noved')) return 'novedad';
+  if (plain.startsWith('mejor')) return 'mejora';
+  if (plain.startsWith('correc')) return 'correccion';
+  if (plain.startsWith('arregl') || plain.startsWith('fix')) return 'correccion';
+  return 'novedad';
+}
+
+function tipoLabel(tipo) {
+  const t = normalizeTipo(tipo);
+  if (t === 'mejora') return 'Mejora';
+  if (t === 'correccion') return 'Corrección';
+  return 'Nuevo';
+}
+
 const Cambios = () => {
   const [cambios, setCambios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeFilter, setActiveFilter] = useState('todo');
 
   useEffect(() => {
     let mounted = true;
@@ -69,19 +92,51 @@ const Cambios = () => {
             <div className="cambios-panel">
               <div className="cambios-toolbar">
                 <div className="cambios-filters">
-                  <button type="button" className="cambios-filter is-active">Todo</button>
-                  <button type="button" className="cambios-filter">Novedad</button>
-                  <button type="button" className="cambios-filter">Mejora</button>
-                  <button type="button" className="cambios-filter">Corrección</button>
+                  <button
+                    type="button"
+                    className={`cambios-filter ${activeFilter === 'todo' ? 'is-active' : ''}`}
+                    onClick={() => setActiveFilter('todo')}
+                  >
+                    Todo
+                  </button>
+                  <button
+                    type="button"
+                    className={`cambios-filter ${activeFilter === 'novedad' ? 'is-active' : ''}`}
+                    onClick={() => setActiveFilter('novedad')}
+                  >
+                    Novedad
+                  </button>
+                  <button
+                    type="button"
+                    className={`cambios-filter ${activeFilter === 'mejora' ? 'is-active' : ''}`}
+                    onClick={() => setActiveFilter('mejora')}
+                  >
+                    Mejora
+                  </button>
+                  <button
+                    type="button"
+                    className={`cambios-filter ${activeFilter === 'correccion' ? 'is-active' : ''}`}
+                    onClick={() => setActiveFilter('correccion')}
+                  >
+                    Corrección
+                  </button>
                 </div>
-                <span className="cambios-toolbar-link">Ver historial completo ▸</span>
+                <Link to="/cambios" className="cambios-toolbar-link">Ver historial completo ▸</Link>
               </div>
 
               <ul className="cambios-list">
-                {cambios.map((cambio) => {
+                {cambios
+                  .filter((cambio) => {
+                    const tipo = normalizeTipo(cambio?.tipo);
+                    return activeFilter === 'todo' ? true : tipo === activeFilter;
+                  })
+                  .map((cambio) => {
                   const fecha = cambio.created_at
                     ? new Date(cambio.created_at).toLocaleDateString('es-CO')
                     : '';
+                  const tipo = normalizeTipo(cambio?.tipo);
+                  const badge = tipoLabel(tipo);
+
                   return (
                     <li key={cambio.id} className="cambio-item">
                       <div className="cambio-icon" aria-hidden="true">🔔</div>
@@ -95,7 +150,7 @@ const Cambios = () => {
                         )}
                       </div>
                       <div className="cambio-side-meta">
-                        <span className="cambio-badge">Nuevo</span>
+                        <span className={`cambio-badge ${tipo !== 'novedad' ? `is-${tipo}` : ''}`}>{badge}</span>
                         {fecha && <span className="cambio-date">{fecha}</span>}
                       </div>
                     </li>

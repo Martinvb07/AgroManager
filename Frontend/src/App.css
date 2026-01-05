@@ -96,6 +96,41 @@
   gap: 24px;
 }
 
+@media (max-width: 767px) {
+  .landing-nav {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .landing-nav-left {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .landing-nav-links {
+    flex-wrap: wrap;
+    gap: 10px;
+    row-gap: 8px;
+    font-size: 13px;
+  }
+
+  .landing-nav-login {
+    white-space: nowrap;
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+
+  .landing-hero-card {
+    padding: 14px 14px 16px;
+    border-radius: 16px;
+  }
+
+  .landing-carousel-slide {
+    height: 190px;
+  }
+}
+
 .landing-hero-text {
   max-width: 560px;
 }
@@ -280,6 +315,7 @@
 /* Lista de cambios en la página /cambios */
 .cambios-panel {
   margin-top: 24px;
+  width: 100%;
   padding: 18px 18px 20px;
   border-radius: 22px;
   background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
@@ -292,11 +328,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .cambios-filters {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .cambios-filter {
@@ -306,7 +345,11 @@
   background: rgba(15, 23, 42, 0.8);
   color: #e5f9f0;
   font-size: 12px;
-  cursor: default;
+  cursor: pointer;
+}
+
+.cambios-filter:hover {
+  border-color: rgba(236, 253, 245, 0.28);
 }
 
 .cambios-filter.is-active {
@@ -318,7 +361,13 @@
 .cambios-toolbar-link {
   font-size: 12px;
   color: #c4d7ff;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.cambios-toolbar-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .cambios-list {
@@ -397,9 +446,56 @@
   font-weight: 600;
 }
 
+.cambio-badge.is-mejora {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(165, 180, 252, 0.75);
+  color: #c7d2fe;
+}
+
+.cambio-badge.is-correccion {
+  background: rgba(251, 191, 36, 0.16);
+  border-color: rgba(251, 191, 36, 0.6);
+  color: #fde68a;
+}
+
 .cambio-date {
   font-size: 12px;
   color: #a5b4fc;
+}
+
+@media (max-width: 700px) {
+  .cambios-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .cambios-toolbar {
+    align-items: flex-start;
+  }
+
+  .cambio-item {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "icon content"
+      "meta meta";
+    align-items: start;
+  }
+
+  .cambio-icon {
+    grid-area: icon;
+  }
+
+  .cambio-content {
+    grid-area: content;
+  }
+
+  .cambio-side-meta {
+    grid-area: meta;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+  }
 }
 
 .landing-actions {
