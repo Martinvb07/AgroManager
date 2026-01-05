@@ -35,6 +35,45 @@ body{background:var(--slate-50);color:var(--slate-800);margin:0;overflow-x:hidde
 .am-pill{background:rgba(255,255,255,.18);padding:8px;border-radius:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .am-header-settings{box-shadow:0 4px 10px rgba(15,23,42,.28)}
 
+/* Menú desplegable de usuario en el header */
+.am-user-menu-wrapper{position:relative}
+.am-user-menu{
+  position:absolute;
+  right:0;
+  top:110%;
+  min-width:190px;
+  background:#ffffff;
+  border-radius:14px;
+  box-shadow:0 18px 40px rgba(15,23,42,.35);
+  padding:6px;
+  z-index:50;
+  transform-origin:top right;
+  animation:am-user-menu-in .18s cubic-bezier(.21,.8,.32,1) forwards;
+}
+.am-user-menu-item{
+  width:100%;
+  border:none;
+  background:transparent;
+  text-align:left;
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:500;
+  color:#0f172a;
+  cursor:pointer;
+}
+.am-user-menu-item:hover{
+  background:#eef2ff;
+}
+.am-user-menu-item-danger{
+  color:#b91c1c;
+}
+
+@keyframes am-user-menu-in{
+  from{opacity:0;transform:translateY(6px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
 /* Cards & badges */
 .am-card{background:var(--white);border:1px solid var(--slate-100);border-radius:var(--radius-xl);box-shadow:var(--shadow)}
 .am-card-header{font-size:18px;font-weight:600;color:var(--slate-800);margin-bottom:12px}

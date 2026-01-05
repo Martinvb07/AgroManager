@@ -145,6 +145,41 @@ const CropManagementDashboard = () => {
   });
   const [deleteFertilizanteId, setDeleteFertilizanteId] = useState(null);
 
+  // Menú de usuario en el header
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [userInfoOpen, setUserInfoOpen] = useState(false);
+
+  const handleLogout = async () => {
+    setUserMenuOpen(false);
+
+    let confirmed = false;
+    try {
+      const module = await import('sweetalert2');
+      const Swal = module.default;
+      const result = await Swal.fire({
+        title: 'Cerrar sesión',
+        text: '¿Seguro que deseas cerrar sesión?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc2626',
+      });
+      confirmed = result.isConfirmed;
+    } catch (e) {
+      // Fallback si SweetAlert2 no está instalado
+      confirmed = window.confirm('¿Seguro que deseas cerrar sesión?');
+    }
+
+    if (!confirmed) return;
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+    navigate('/login');
+  };
+
   // Modales: campanas
   const [campanaModalOpen, setCampanaModalOpen] = useState(false);
   const [campanaEditing, setCampanaEditing] = useState(null);
@@ -897,9 +932,47 @@ const CropManagementDashboard = () => {
               <p className="am-header-user-label">Usuario</p>
               <p className="am-header-user-name">{currentUser?.nombre || 'Usuario'}</p>
             </div>
-            <button className="am-pill am-header-settings" aria-label="Configuración">
-              <Settings className="am-icon-lg" />
-            </button>
+            <div className="am-user-menu-wrapper">
+              <button
+                type="button"
+                className="am-pill am-header-settings"
+                aria-label="Menú de usuario"
+                onClick={() => setUserMenuOpen((open) => !open)}
+              >
+                <Settings className="am-icon-lg" />
+              </button>
+              {userMenuOpen && (
+                <div className="am-user-menu">
+                  <button
+                    type="button"
+                    className="am-user-menu-item"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      setUserInfoOpen(true);
+                    }}
+                  >
+                    Información de usuario
+                  </button>
+                  <button
+                    type="button"
+                    className="am-user-menu-item"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      window.location.href = 'mailto:soporte@agromanager.pro?subject=Soporte%20AgroManager';
+                    }}
+                  >
+                    Soporte
+                  </button>
+                  <button
+                    type="button"
+                    className="am-user-menu-item am-user-menu-item-danger"
+                    onClick={handleLogout}
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -910,6 +983,37 @@ const CropManagementDashboard = () => {
           {renderContent()}
         </div>
       </div>
+
+      {userInfoOpen && (
+        <div className="am-modal-backdrop">
+          <div className="am-modal">
+            <h3 className="am-modal-title">Información de usuario</h3>
+            <div className="am-modal-body">
+              <div className="am-modal-row">
+                <label>Nombre</label>
+                <p>{currentUser?.nombre || '-'}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Correo</label>
+                <p>{currentUser?.email || '-'}</p>
+              </div>
+              <div className="am-modal-row">
+                <label>Rol</label>
+                <p>{currentUser?.rol || '-'}</p>
+              </div>
+            </div>
+            <div className="am-modal-actions">
+              <button
+                type="button"
+                className="am-btn am-btn-primary"
+                onClick={() => setUserInfoOpen(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {parcelaDetalleOpen && parcelaDetalle && (
         <div className="am-modal-backdrop">

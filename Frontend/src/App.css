@@ -642,3 +642,141 @@
   }
 }
 
+/* ==========================
+   Panel del dueño (owner)
+   ========================== */
+
+.admin-page {
+  min-height: 100vh;
+  padding: 32px 16px 40px;
+  background: #f3f4f6;
+}
+
+.admin-header {
+  max-width: 1120px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.admin-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.admin-button {
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.28);
+}
+
+.admin-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px 20px 22px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12);
+  border: 1px solid #e5e7eb;
+}
+
+.section-title {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mt-8 {
+  margin-top: 32px;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.grid {
+  display: grid;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.text-green-600 {
+  color: #16a34a;
+}
+
+.text-sm {
+  font-size: 13px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.data-table thead th {
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.data-table tbody tr:hover {
+  background: #eef2ff;
+}
+
+@media (max-width: 640px) {
+  .admin-page {
+    padding: 20px 12px 28px;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-main {
+    gap: 18px;
+  }
+
+  .admin-card {
+    padding: 20px 16px 18px;
+    border-radius: 18px;
+  }
+}
+
