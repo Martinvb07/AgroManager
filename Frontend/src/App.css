@@ -271,6 +271,11 @@
   padding-bottom: 20px;
 }
 
+/* En /cambios queremos que el contenido use todo el ancho disponible */
+.cambios-page .shell-inner--wide {
+  max-width: none;
+}
+
 .cambios-page .landing-main {
   padding-top: 14px;
 }
