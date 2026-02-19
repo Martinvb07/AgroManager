@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchCambios } from '../services/api.js';
+import '../styles/Cambios.css';
 
 function normalizeTipo(raw) {
   const value = (raw || '').toString().trim().toLowerCase();

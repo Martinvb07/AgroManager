@@ -1,0 +1,355 @@
+/* Estilos exclusivos de la vista Cambios */
+
+.shell-inner {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.shell-inner--wide {
+  max-width: 1440px;
+}
+
+/* En /cambios queremos que el contenido use todo el ancho disponible */
+.cambios-page .shell-inner--wide {
+  max-width: none;
+}
+
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(160deg, #047857, #059669, #0d9488);
+}
+
+.landing-header {
+  padding: 20px 16px 32px;
+  color: #ecfdf5;
+}
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.landing-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.landing-logo {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  font-size: 18px;
+}
+
+.landing-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.landing-nav-links a {
+  color: #e5f9f0;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.landing-nav-links a:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.landing-nav-login {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #ecfdf5;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
+.landing-hero {
+  display: grid;
+  gap: 24px;
+}
+
+.landing-hero-text {
+  max-width: 560px;
+}
+
+.landing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.35);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.landing-title {
+  margin: 10px 0 6px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.landing-subtitle {
+  margin-top: 4px;
+  max-width: 420px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.landing-main {
+  flex: 1;
+  background: transparent;
+  padding: 32px 16px 40px;
+}
+
+/* Ajustes para /cambios: panel más grande y menos espacio vacío */
+.cambios-page .landing-header {
+  padding-bottom: 20px;
+}
+
+.cambios-page .landing-main {
+  padding-top: 14px;
+}
+
+.cambios-page .cambios-panel {
+  margin-top: 14px;
+}
+
+.landing-section {
+  margin-bottom: 24px;
+}
+
+.landing-text {
+  margin: 0;
+  font-size: 14px;
+  color: #e5f9f0;
+}
+
+/* Lista de cambios */
+.cambios-panel {
+  margin-top: 24px;
+  width: 100%;
+  padding: 22px 22px 24px;
+  border-radius: 24px;
+  background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.88));
+  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(236, 253, 245, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.cambios-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cambios-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cambios-filter {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5f9f0;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cambios-filter:hover {
+  border-color: rgba(236, 253, 245, 0.28);
+}
+
+.cambios-filter.is-active {
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+}
+
+.cambios-toolbar-link {
+  font-size: 12px;
+  color: #c4d7ff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.cambios-toolbar-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cambios-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.cambio-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+  border-radius: 20px;
+  padding: 18px 22px;
+}
+
+.cambio-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 0 0, #4ade80, #22c55e);
+  font-size: 22px;
+}
+
+.cambio-content {
+  min-width: 0;
+}
+
+.cambio-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cambio-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.cambio-desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(226, 232, 240, 0.9);
+  line-height: 1.4;
+}
+
+.cambio-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(167, 243, 208, 0.8);
+}
+
+.cambio-side-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.cambio-badge {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(0, 255, 148, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(34, 197, 94, 0.6);
+  font-weight: 600;
+}
+
+.cambio-badge.is-mejora {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(165, 180, 252, 0.75);
+  color: #c7d2fe;
+}
+
+.cambio-badge.is-correccion {
+  background: rgba(251, 191, 36, 0.16);
+  border-color: rgba(251, 191, 36, 0.6);
+  color: #fde68a;
+}
+
+.cambio-date {
+  font-size: 12px;
+  color: #a5b4fc;
+}
+
+@media (max-width: 700px) {
+  .cambios-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .cambios-toolbar {
+    align-items: flex-start;
+  }
+
+  .cambio-item {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "icon content"
+      "meta meta";
+    align-items: start;
+  }
+
+  .cambio-icon {
+    grid-area: icon;
+  }
+
+  .cambio-content {
+    grid-area: content;
+  }
+
+  .cambio-side-meta {
+    grid-area: meta;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell-inner {
+    max-width: 1200px;
+  }
+
+  .shell-inner--wide {
+    max-width: 1600px;
+  }
+
+  .landing-header {
+    padding: 28px 24px 44px;
+  }
+
+  .landing-main {
+    padding: 40px 24px 56px;
+  }
+
+  .landing-title {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+
+  .landing-subtitle {
+    font-size: 15px;
+  }
+}

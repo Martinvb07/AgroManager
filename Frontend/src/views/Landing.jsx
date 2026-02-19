@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Tractor, ShieldCheck } from 'lucide-react';
 import { fetchCambios } from '../services/api.js';
+import '../styles/Landing.css';
 
 function normalizeTipo(raw) {
   const value = (raw || '').toString().trim().toLowerCase();

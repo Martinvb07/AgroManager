@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchUsuarios, crearUsuario, crearCambio, fetchCambios } from '../services/api.js';
+import '../styles/OwnerDashboard.css';
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();

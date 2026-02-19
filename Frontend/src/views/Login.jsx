@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { login } from '../services/api.js';
+import '../styles/Login.css';
 
 const Login = () => {
   const navigate = useNavigate();

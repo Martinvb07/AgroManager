@@ -1,0 +1,3 @@
+/* Archivo legacy: antes se importaba globalmente desde App.jsx.
+   Ahora la app usa CSS por vista + styles/index.css.
+   Se deja aquí por si quieres migrar estilos restantes más adelante. */
