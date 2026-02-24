@@ -11,6 +11,7 @@ import campanasRoutes from './campanas.routes.js';
 import authRoutes from './auth.routes.js';
 import ownerRoutes from './owner.routes.js';
 import cambiosRoutes from './cambios.routes.js';
+import aiRoutes from './ai.routes.js';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/campanas', campanasRoutes);
 router.use('/auth', authRoutes);
 router.use('/owner', ownerRoutes);
 router.use('/cambios', cambiosRoutes);
+router.use('/ai', aiRoutes);
 
 export default router;

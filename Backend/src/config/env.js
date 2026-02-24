@@ -13,4 +13,10 @@ export const env = {
   DB_PASSWORD: process.env.DB_PASSWORD || '',
   DB_NAME: process.env.DB_NAME || 'agromanager',
   DB_POOL_LIMIT: process.env.DB_POOL_LIMIT ? Number(process.env.DB_POOL_LIMIT) : 10,
+  // --- IA (opcional) ---
+  // Si no se configura, el backend responde con recomendaciones heurísticas.
+  AI_PROVIDER: process.env.AI_PROVIDER || 'heuristic', // 'heuristic' | 'openai'
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
+  OPENAI_BASE_URL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+  OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4o-mini',
 };

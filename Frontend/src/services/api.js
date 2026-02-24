@@ -259,6 +259,19 @@ export async function crearRiego(payload) {
   return json.data;
 }
 
+// --- IA / Asistente ---
+
+export async function pedirConsejoIA({ question, context } = {}) {
+  const json = await request('/ai/advice', {
+    method: 'POST',
+    body: JSON.stringify({
+      question: question || '',
+      context: context || {},
+    }),
+  });
+  return json.data; // { answer, provider }
+}
+
 export async function actualizarRiego(id, payload) {
   const json = await request(`/riego/${id}`, {
     method: 'PUT',

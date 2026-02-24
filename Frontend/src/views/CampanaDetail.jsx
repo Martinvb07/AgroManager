@@ -159,9 +159,11 @@ const CampanaDetail = () => {
       const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
         const point = e.touches && e.touches[0] ? e.touches[0] : e;
+        const scaleX = rect.width ? canvas.width / rect.width : 1;
+        const scaleY = rect.height ? canvas.height / rect.height : 1;
         return {
-          x: point.clientX - rect.left,
-          y: point.clientY - rect.top,
+          x: (point.clientX - rect.left) * scaleX,
+          y: (point.clientY - rect.top) * scaleY,
         };
       };
 
@@ -275,7 +277,22 @@ const CampanaDetail = () => {
   };
 
   if (loading) {
-    return <p style={{ padding: '32px' }}>Cargando campaña...</p>;
+    return (
+      <div className="am-loader-page">
+        <div className="am-card am-loader-card" role="status" aria-live="polite">
+          <div className="am-spinner" aria-hidden="true" />
+          <div style={{ width: '100%' }}>
+            <p className="am-loader-title">Cargando campaña</p>
+            <p className="am-loader-subtitle">Estamos preparando la información…</p>
+            <div className="am-skeleton-lines" aria-hidden="true">
+              <div className="am-skeleton-line w-85" />
+              <div className="am-skeleton-line w-70" />
+              <div className="am-skeleton-line w-50" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!campana || !form) {
@@ -569,7 +586,7 @@ const CampanaDetail = () => {
         </div>
       </div>
 
-      <div className="am-container" style={{ paddingTop: '24px', paddingBottom: '32px' }}>
+      <div className="am-container am-container-detail">
         <button
           onClick={() => navigate(-1)}
           className="am-badge am-muted"
@@ -956,9 +973,9 @@ const CampanaDetail = () => {
                   <label>Firma conductor</label>
                   <canvas
                     ref={conductorCanvasRef}
-                    width={260}
-                    height={100}
-                    style={{ border: '1px solid #e2e8f0', borderRadius: '10px', background: '#ffffff' }}
+                    width={520}
+                    height={120}
+                    className="am-sign-canvas"
                   />
                   <button
                     type="button"
@@ -973,9 +990,9 @@ const CampanaDetail = () => {
                   <label>Firma propietario</label>
                   <canvas
                     ref={propietarioCanvasRef}
-                    width={260}
-                    height={100}
-                    style={{ border: '1px solid #e2e8f0', borderRadius: '10px', background: '#ffffff' }}
+                    width={520}
+                    height={120}
+                    className="am-sign-canvas"
                   />
                   <button
                     type="button"
@@ -1008,7 +1025,7 @@ const CampanaDetail = () => {
           </div>
         )}
 
-        <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+        <div className="am-footer-actions">
           <button
             className="am-btn am-btn-ghost"
             type="button"

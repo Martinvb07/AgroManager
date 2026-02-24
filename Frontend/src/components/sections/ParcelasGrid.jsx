@@ -19,7 +19,7 @@ const ParcelasGrid = ({ parcelas = [], onAdd, onEdit, onView }) => {
               <h3 style={{fontSize:'20px',fontWeight:700,color:'#111827'}}>{parcela.nombre}</h3>
               <span className={`am-badge ${colorEstado(parcela.estado)}`}>{parcela.estado}</span>
             </div>
-            <div className="am-grid" style={{gridTemplateColumns:'repeat(2,1fr)',gap:'16px',marginBottom:'12px'}}>
+            <div className="am-two-col" style={{marginBottom:'12px'}}>
               <div style={{background:'#ecfdf5',padding:'12px',borderRadius:'10px'}}>
                 <p style={{fontSize:'12px',color:'#475569',marginBottom:'4px'}}>Hectáreas</p>
                 <p style={{fontSize:'18px',fontWeight:800,color:'#059669'}}>{parcela.hectareas ?? 0} ha</p>

@@ -1010,7 +1010,9 @@ const CropManagementDashboard = () => {
       </div>
 
       <div className="am-container">
-        <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
+        <div className="am-card am-nav-card">
+          <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
+        </div>
         <div className="am-card am-main-card">
           {renderContent()}
         </div>

@@ -1,4 +1,5 @@
 import { MapPin, Users, TrendingUp, DollarSign, Truck } from 'lucide-react';
+import AiAssistantCard from './AiAssistantCard.jsx';
 
 const DashboardOverview = ({ stats, ingresos, egresos, alerts = [] }) => {
   const safeStats = stats || {
@@ -137,6 +138,10 @@ const DashboardOverview = ({ stats, ingresos, egresos, alerts = [] }) => {
             })}
           </div>
         </div>
+      </div>
+
+      <div style={{ marginTop: '24px' }}>
+        <AiAssistantCard stats={safeStats} ingresos={ingresos} egresos={egresos} alerts={alertCards} />
       </div>
     </div>
   );

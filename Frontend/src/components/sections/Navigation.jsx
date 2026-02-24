@@ -26,7 +26,9 @@ const Navigation = ({ activeSection, setActiveSection }) => (
           onClick={() => setActiveSection(section.id)}
           className={`am-nav-btn ${colorClass} ${isActive ? 'is-active' : ''}`}
         >
-          <Icon className="am-icon-lg" />
+          <span className="am-icon-wrap">
+            <Icon className="am-icon-lg" />
+          </span>
           <p className="label">{section.name}</p>
         </button>
       );
