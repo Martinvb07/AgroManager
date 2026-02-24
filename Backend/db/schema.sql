@@ -1,6 +1,19 @@
 CREATE DATABASE IF NOT EXISTS agromanager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE agromanager;
 
+-- Tabla de usuarios (auth)
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL,
+  email VARCHAR(160) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  rol VARCHAR(40) NOT NULL DEFAULT 'admin',
+  estado VARCHAR(40) NOT NULL DEFAULT 'Activo',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_usuarios_email (email)
+) ENGINE=InnoDB;
+
 -- Tabla de parcelas (multi-tenant por usuario)
 CREATE TABLE IF NOT EXISTS parcelas (
   id INT AUTO_INCREMENT PRIMARY KEY,
