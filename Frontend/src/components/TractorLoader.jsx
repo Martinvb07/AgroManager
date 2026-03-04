@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import '../styles/TractorLoader.css';
 
 /**
- * Full-screen loading overlay with an animated tractor driving across a farm scene.
+ * Full-screen loading overlay with a minimalist B&W tractor + trailer animation.
  *
  * Props:
  *   message  – text shown below the tractor (default "Cargando…")
@@ -18,7 +18,7 @@ export default function TractorLoader({ message = 'Cargando…', onFinish, visib
       const t = setTimeout(() => {
         setPhase('done');
         onFinish?.();
-      }, 600); // matches CSS exit duration
+      }, 600);
       return () => clearTimeout(t);
     }
   }, [visible, phase, onFinish]);
@@ -27,51 +27,45 @@ export default function TractorLoader({ message = 'Cargando…', onFinish, visib
 
   return (
     <div className={`tractor-loader ${phase === 'exit' ? 'tractor-loader--exit' : ''}`}>
-      {/* Sky */}
-      <div className="tractor-sky">
-        <div className="tractor-cloud tractor-cloud--1" />
-        <div className="tractor-cloud tractor-cloud--2" />
-        <div className="tractor-cloud tractor-cloud--3" />
-        <div className="tractor-sun" />
-      </div>
+      {/* Ground line */}
+      <div className="tractor-groundline" />
 
-      {/* Ground */}
-      <div className="tractor-ground">
-        <div className="tractor-ground-dirt" />
-        {/* Crop rows */}
-        <div className="tractor-crops">
-          <div className="tractor-crop-row" />
-          <div className="tractor-crop-row" />
-          <div className="tractor-crop-row" />
-          <div className="tractor-crop-row" />
-          <div className="tractor-crop-row" />
-        </div>
-      </div>
-
-      {/* Tractor */}
-      <div className="tractor-vehicle">
-        {/* Exhaust smoke */}
+      {/* Tractor + Trailer group – drives across screen */}
+      <div className="tractor-rig">
+        {/* Smoke */}
         <div className="tractor-smoke">
           <span /><span /><span />
         </div>
-        {/* Body */}
+
+        {/* Tractor */}
         <div className="tractor-body">
+          {/* Cabin */}
           <div className="tractor-cabin">
             <div className="tractor-window" />
           </div>
-          <div className="tractor-engine" />
-          <div className="tractor-exhaust-pipe" />
+          {/* Hood */}
+          <div className="tractor-hood" />
+          {/* Exhaust pipe */}
+          <div className="tractor-exhaust" />
+          {/* Back wheel */}
+          <div className="tractor-wheel tractor-wheel--back">
+            <div className="tractor-wheel-hub" />
+          </div>
+          {/* Front wheel */}
+          <div className="tractor-wheel tractor-wheel--front">
+            <div className="tractor-wheel-hub" />
+          </div>
         </div>
-        {/* Wheels */}
-        <div className="tractor-wheel tractor-wheel--back">
-          <div className="tractor-wheel-hub" />
-        </div>
-        <div className="tractor-wheel tractor-wheel--front">
-          <div className="tractor-wheel-hub" />
-        </div>
-        {/* Dust trail */}
-        <div className="tractor-dust">
-          <span /><span /><span /><span />
+
+        {/* Hitch bar */}
+        <div className="tractor-hitch" />
+
+        {/* Trailer */}
+        <div className="tractor-trailer">
+          <div className="tractor-trailer-bed" />
+          <div className="tractor-wheel tractor-wheel--trailer">
+            <div className="tractor-wheel-hub" />
+          </div>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────
-   TractorLoader – Full-screen farm loading animation
+   TractorLoader – Minimalist B&W tractor + trailer
    ───────────────────────────────────────────── */
 
 /* ── Overlay ── */
@@ -8,9 +8,9 @@
   inset: 0;
   z-index: 99999;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  background: #000;
   overflow: hidden;
   animation: tractorFadeIn 0.4s ease-out;
 }
@@ -28,296 +28,149 @@
   to   { opacity: 0; }
 }
 
-/* ── Sky ── */
-.tractor-sky {
+/* ── Ground line ── */
+.tractor-groundline {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #E0F7E0 100%);
+  bottom: 38%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.35);
 }
 
-/* Sun */
-.tractor-sun {
-  position: absolute;
-  top: 10%;
-  right: 15%;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #FFD700;
-  box-shadow: 0 0 40px 15px rgba(255, 215, 0, 0.35), 0 0 80px 30px rgba(255, 215, 0, 0.15);
-}
-
-/* Clouds */
-.tractor-cloud {
-  position: absolute;
-  background: #fff;
-  border-radius: 999px;
-  opacity: 0.85;
-}
-.tractor-cloud::before,
-.tractor-cloud::after {
-  content: '';
-  position: absolute;
-  background: inherit;
-  border-radius: inherit;
-}
-
-.tractor-cloud--1 {
-  width: 100px;
-  height: 32px;
-  top: 12%;
-  left: -100px;
-  animation: cloudDrift 18s linear infinite;
-}
-.tractor-cloud--1::before {
-  width: 50px;
-  height: 40px;
-  top: -20px;
-  left: 18px;
-}
-.tractor-cloud--1::after {
-  width: 40px;
-  height: 30px;
-  top: -12px;
-  left: 52px;
-}
-
-.tractor-cloud--2 {
-  width: 80px;
-  height: 26px;
-  top: 20%;
-  left: -80px;
-  animation: cloudDrift 24s linear infinite 6s;
-  opacity: 0.7;
-}
-.tractor-cloud--2::before {
-  width: 40px;
-  height: 32px;
-  top: -16px;
-  left: 14px;
-}
-
-.tractor-cloud--3 {
-  width: 120px;
-  height: 36px;
-  top: 8%;
-  left: -120px;
-  animation: cloudDrift 22s linear infinite 12s;
-  opacity: 0.6;
-}
-.tractor-cloud--3::before {
-  width: 60px;
-  height: 44px;
-  top: -22px;
-  left: 24px;
-}
-.tractor-cloud--3::after {
-  width: 45px;
-  height: 34px;
-  top: -14px;
-  left: 70px;
-}
-
-@keyframes cloudDrift {
-  from { transform: translateX(0); }
-  to   { transform: translateX(calc(100vw + 200px)); }
-}
-
-/* ── Ground ── */
-.tractor-ground {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 35%;
-  z-index: 1;
-}
-
-.tractor-ground-dirt {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #4CAF50 0%, #388E3C 15%, #6D4C2A 16%, #5D4022 100%);
-}
-
-/* Animated crop rows that scroll left */
-.tractor-crops {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 15%;
+/* ── Tractor + Trailer rig ── */
+.tractor-rig {
+  position: relative;
   display: flex;
+  align-items: flex-end;
   gap: 0;
-  animation: cropScroll 3s linear infinite;
-}
-.tractor-crop-row {
-  flex: 1;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 20px,
-    #2E7D32 20px,
-    #2E7D32 24px,
-    transparent 24px,
-    transparent 44px
-  );
-  opacity: 0.7;
+  animation: rigDrive 6s linear infinite;
+  bottom: -8%;
 }
 
-@keyframes cropScroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* ── Tractor Vehicle ── */
-.tractor-vehicle {
-  position: absolute;
-  bottom: 28%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  animation: tractorBounce 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes tractorBounce {
-  from { transform: translateX(-50%) translateY(0); }
-  to   { transform: translateX(-50%) translateY(-4px); }
+@keyframes rigDrive {
+  0%   { transform: translateX(-120vw); }
+  100% { transform: translateX(120vw); }
 }
 
 /* ── Tractor Body ── */
 .tractor-body {
   position: relative;
-  width: 120px;
-  height: 70px;
+  width: 110px;
+  height: 80px;
 }
 
 /* Cabin */
 .tractor-cabin {
   position: absolute;
-  bottom: 20px;
-  left: 10px;
-  width: 55px;
-  height: 50px;
-  background: linear-gradient(135deg, #D32F2F, #B71C1C);
-  border-radius: 6px 10px 2px 2px;
-  border: 2px solid #8B0000;
+  bottom: 28px;
+  left: 5px;
+  width: 48px;
+  height: 48px;
+  background: #fff;
+  border-radius: 4px 8px 0 0;
 }
 
 .tractor-window {
   position: absolute;
   top: 6px;
   left: 6px;
-  right: 6px;
-  height: 22px;
-  background: linear-gradient(135deg, #81D4FA, #B3E5FC);
-  border-radius: 3px 6px 3px 3px;
-  border: 1px solid #0288D1;
-  opacity: 0.9;
+  width: 22px;
+  height: 20px;
+  background: #000;
+  border-radius: 2px 4px 2px 2px;
 }
 
-/* Engine hood */
-.tractor-engine {
+/* Hood / engine */
+.tractor-hood {
   position: absolute;
-  bottom: 20px;
-  left: 65px;
-  width: 50px;
-  height: 30px;
-  background: linear-gradient(135deg, #E53935, #C62828);
-  border-radius: 2px 8px 4px 2px;
-  border: 2px solid #8B0000;
+  bottom: 28px;
+  left: 53px;
+  width: 52px;
+  height: 28px;
+  background: #fff;
+  border-radius: 0 6px 0 0;
 }
 
 /* Exhaust pipe */
-.tractor-exhaust-pipe {
+.tractor-exhaust {
   position: absolute;
-  bottom: 50px;
-  left: 100px;
-  width: 6px;
-  height: 22px;
-  background: #555;
+  bottom: 56px;
+  left: 92px;
+  width: 5px;
+  height: 20px;
+  background: #fff;
   border-radius: 2px 2px 0 0;
-  border: 1px solid #333;
 }
 
-/* ── Exhaust Smoke ── */
+/* ── Smoke ── */
 .tractor-smoke {
   position: absolute;
-  top: -25px;
-  left: 95px;
+  top: -10px;
+  left: 90px;
+  z-index: 2;
 }
 .tractor-smoke span {
   position: absolute;
   display: block;
   border-radius: 50%;
-  background: rgba(180, 180, 180, 0.5);
-  animation: smokeRise 1.5s ease-out infinite;
+  background: rgba(255, 255, 255, 0.4);
+  animation: smokeRise 1.8s ease-out infinite;
 }
 .tractor-smoke span:nth-child(1) {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   left: 0;
   animation-delay: 0s;
 }
 .tractor-smoke span:nth-child(2) {
-  width: 16px;
-  height: 16px;
-  left: 6px;
-  animation-delay: 0.5s;
+  width: 14px;
+  height: 14px;
+  left: 5px;
+  animation-delay: 0.6s;
 }
 .tractor-smoke span:nth-child(3) {
-  width: 10px;
-  height: 10px;
-  left: -4px;
-  animation-delay: 1s;
+  width: 8px;
+  height: 8px;
+  left: -3px;
+  animation-delay: 1.2s;
 }
 
 @keyframes smokeRise {
-  0%   { opacity: 0.6; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-40px) translateX(10px) scale(2); }
+  0%   { opacity: 0.5; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-35px) translateX(8px) scale(2.2); }
 }
 
 /* ── Wheels ── */
 .tractor-wheel {
   position: absolute;
   border-radius: 50%;
-  background: #2C2C2C;
-  border: 3px solid #1a1a1a;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: wheelSpin 0.6s linear infinite;
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.4);
+  animation: wheelSpin 0.5s linear infinite;
 }
 
 .tractor-wheel--back {
   width: 48px;
   height: 48px;
-  bottom: -24px;
-  left: 8px;
+  bottom: 4px;
+  left: 6px;
 }
 
 .tractor-wheel--front {
-  width: 34px;
-  height: 34px;
-  bottom: -17px;
-  left: 85px;
+  width: 32px;
+  height: 32px;
+  bottom: 12px;
+  left: 82px;
 }
 
 .tractor-wheel-hub {
-  width: 35%;
-  height: 35%;
+  width: 40%;
+  height: 40%;
   border-radius: 50%;
-  background: #aaa;
-  border: 2px solid #888;
-}
-
-/* Tread marks on wheels */
-.tractor-wheel::before {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: 50%;
-  border: 2px dashed rgba(255,255,255,0.15);
+  background: #000;
 }
 
 @keyframes wheelSpin {
@@ -325,91 +178,95 @@
   to   { transform: rotate(360deg); }
 }
 
-/* ── Dust Trail ── */
-.tractor-dust {
+/* Tread marks */
+.tractor-wheel::before {
+  content: '';
   position: absolute;
-  bottom: -12px;
-  left: -30px;
-}
-.tractor-dust span {
-  position: absolute;
-  display: block;
+  inset: 4px;
   border-radius: 50%;
-  background: rgba(160, 130, 90, 0.4);
-  animation: dustPuff 1s ease-out infinite;
-}
-.tractor-dust span:nth-child(1) {
-  width: 14px;
-  height: 14px;
-  bottom: 0;
-  left: 0;
-  animation-delay: 0s;
-}
-.tractor-dust span:nth-child(2) {
-  width: 18px;
-  height: 18px;
-  bottom: 4px;
-  left: -10px;
-  animation-delay: 0.25s;
-}
-.tractor-dust span:nth-child(3) {
-  width: 12px;
-  height: 12px;
-  bottom: -2px;
-  left: -18px;
-  animation-delay: 0.5s;
-}
-.tractor-dust span:nth-child(4) {
-  width: 20px;
-  height: 20px;
-  bottom: 6px;
-  left: -28px;
-  animation-delay: 0.75s;
+  border: 2px dashed rgba(0, 0, 0, 0.25);
 }
 
-@keyframes dustPuff {
-  0%   { opacity: 0.6; transform: translate(0, 0) scale(1); }
-  100% { opacity: 0; transform: translate(-20px, 5px) scale(1.8); }
+/* ── Hitch bar ── */
+.tractor-hitch {
+  width: 16px;
+  height: 4px;
+  background: #fff;
+  align-self: center;
+  margin-bottom: 24px;
+}
+
+/* ── Trailer ── */
+.tractor-trailer {
+  position: relative;
+  width: 130px;
+  height: 64px;
+  margin-bottom: 0;
+}
+
+.tractor-trailer-bed {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  width: 130px;
+  height: 40px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+/* Trailer side wall detail */
+.tractor-trailer-bed::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  border-left: 3px solid rgba(0, 0, 0, 0.15);
+  border-right: 3px solid rgba(0, 0, 0, 0.15);
+  border-top: 3px solid rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+.tractor-wheel--trailer {
+  width: 30px;
+  height: 30px;
+  bottom: 9px;
+  left: 10px;
 }
 
 /* ── Message ── */
 .tractor-message {
   position: absolute;
-  bottom: 10%;
+  bottom: 20%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: #2E7D32;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 10px 28px;
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  letter-spacing: 0.01em;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.04em;
   white-space: nowrap;
   animation: messagePulse 2s ease-in-out infinite;
 }
 
 @keyframes messagePulse {
   0%, 100% { opacity: 1; }
-  50%      { opacity: 0.7; }
+  50%      { opacity: 0.4; }
 }
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
-  .tractor-sun {
-    width: 40px;
-    height: 40px;
-  }
   .tractor-body {
-    transform: scale(0.8);
+    transform: scale(0.75);
     transform-origin: bottom center;
   }
+  .tractor-trailer {
+    transform: scale(0.75);
+    transform-origin: bottom left;
+  }
   .tractor-message {
-    font-size: 15px;
-    padding: 8px 20px;
+    font-size: 14px;
   }
 }

@@ -959,7 +959,7 @@ const CropManagementDashboard = () => {
   };
 
   return (
-    <div style={{minHeight:'100vh',background:'linear-gradient(135deg, #f8fafc, #ecfdf5)'}}>
+    <div className="am-root">
       {showLogoutLoader && <TractorLoader message="Cerrando sesión…" />}
       <div className="am-header">
         <div className="am-header-inner">
