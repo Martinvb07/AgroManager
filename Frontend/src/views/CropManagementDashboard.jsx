@@ -13,6 +13,7 @@ import RiegoTable from '../components/sections/RiegoTable.jsx';
 import FertilizantesTable from '../components/sections/FertilizantesTable.jsx';
 import ReportesGrid from '../components/sections/ReportesGrid.jsx';
 import CampanasTable from '../components/sections/CampanasTable.jsx';
+import TractorLoader from '../components/TractorLoader.jsx';
 
 import {
   parcelas as initialParcelas,
@@ -180,6 +181,7 @@ const CropManagementDashboard = () => {
   // Menú de usuario en el header
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [userInfoOpen, setUserInfoOpen] = useState(false);
+  const [showLogoutLoader, setShowLogoutLoader] = useState(false);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -199,17 +201,22 @@ const CropManagementDashboard = () => {
       });
       confirmed = result.isConfirmed;
     } catch (e) {
-      // Fallback si SweetAlert2 no está instalado
       confirmed = window.confirm('¿Seguro que deseas cerrar sesión?');
     }
 
     if (!confirmed) return;
 
+    // Show tractor loader
+    setShowLogoutLoader(true);
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
-    navigate('/login');
+
+    setTimeout(() => {
+      navigate('/login');
+    }, 2000);
   };
 
   // Modales: campanas
@@ -953,6 +960,7 @@ const CropManagementDashboard = () => {
 
   return (
     <div style={{minHeight:'100vh',background:'linear-gradient(135deg, #f8fafc, #ecfdf5)'}}>
+      {showLogoutLoader && <TractorLoader message="Cerrando sesión…" />}
       <div className="am-header">
         <div className="am-header-inner">
           <div className="am-header-brand">

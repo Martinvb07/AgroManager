@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { login } from '../services/api.js';
+import TractorLoader from '../components/TractorLoader.jsx';
 import '../styles/Login.css';
 
 const Login = () => {
@@ -10,6 +11,9 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  const [loaderMessage, setLoaderMessage] = useState('');
+  const [pendingRoute, setPendingRoute] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,11 +31,11 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(data));
       }
       const role = (data?.rol || '').toString().toLowerCase();
-      if (role === 'owner') {
-        navigate('/owner');
-      } else {
-        navigate('/admin');
-      }
+      const dest = role === 'owner' ? '/owner' : '/admin';
+
+      setLoaderMessage('Iniciando sesión…');
+      setShowLoader(true);
+      setPendingRoute(dest);
     } catch (err) {
       const message = err?.message || 'No se pudo iniciar sesión';
       setError(message.includes('Error') ? 'Correo o contraseña incorrectos' : message);
@@ -40,8 +44,16 @@ const Login = () => {
     }
   };
 
+  // After loader shows for 2s, start exit animation then navigate
+  if (showLoader && pendingRoute) {
+    setTimeout(() => {
+      navigate(pendingRoute);
+    }, 2000);
+  }
+
   return (
     <div className="login-page">
+      {showLoader && <TractorLoader message={loaderMessage} />}
       <main className="login-main">
         <section className="login-card">
           <header className="login-header">
