@@ -272,6 +272,14 @@ export async function pedirConsejoIA({ question, context } = {}) {
   return json.data; // { answer, provider }
 }
 
+export async function enviarMensajeChat({ messages } = {}) {
+  const json = await request('/ai/chat', {
+    method: 'POST',
+    body: JSON.stringify({ messages: messages || [] }),
+  });
+  return json.data; // { answer, provider }
+}
+
 export async function actualizarRiego(id, payload) {
   const json = await request(`/riego/${id}`, {
     method: 'PUT',

@@ -1,0 +1,186 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+hide methods
+
+skinparam class {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+}
+
+package "Seguridad y usuarios" {
+  class Usuario <<entity>> {
+    +id: int
+    +nombre: string
+    +email: string
+    +password_hash: string
+    +rol: string
+    +estado: string
+    +created_at: datetime
+    +updated_at: datetime
+  }
+
+  class Cambio <<entity>> {
+    +id: int
+    +titulo: string
+    +descripcion: text
+    +tipo: string
+    +created_at: datetime
+  }
+}
+
+package "Operación agrícola" {
+  class Parcela <<entity>> {
+    +id: int
+    +nombre: string
+    +hectareas: decimal
+    +cultivo: string
+    +estado: string
+    +inversion: decimal
+  }
+
+  class Trabajador <<entity>> {
+    +id: int
+    +nombre: string
+    +cargo: string
+    +salario: decimal
+    +horas_trabajadas: int
+    +estado: string
+  }
+
+  class Maquinaria <<entity>> {
+    +id: int
+    +nombre: string
+    +tipo: string
+    +estado: string
+    +ultimo_mantenimiento: date
+    +proximo_mantenimiento: date
+  }
+
+  class Semilla <<entity>> {
+    +id: int
+    +tipo: string
+    +cantidad: string
+    +proveedor: string
+    +costo: decimal
+  }
+
+  class Plaga <<entity>> {
+    +id: int
+    +nombre: string
+    +nivel: string
+    +ubicacion: string
+    +fecha: date
+    +tratamiento: string
+  }
+
+  class Riego <<entity>> {
+    +id: int
+    +tipo: string
+    +ultimo_riego: date
+    +proximo_riego: date
+    +consumo_agua: string
+  }
+
+  class Fertilizante <<entity>> {
+    +id: int
+    +nombre: string
+    +cantidad: string
+    +fecha_aplicacion: date
+    +costo: decimal
+  }
+}
+
+package "Finanzas" {
+  class Ingreso <<entity>> {
+    +id: int
+    +concepto: string
+    +monto: decimal
+    +fecha: date
+    +tipo: string
+  }
+
+  class Egreso <<entity>> {
+    +id: int
+    +concepto: string
+    +monto: decimal
+    +fecha: date
+    +tipo: string
+    +categoria: string
+  }
+}
+
+package "Campañas" {
+  class Campana <<entity>> {
+    +id: int
+    +nombre: string
+    +fecha_inicio: date
+    +fecha_fin: date
+    +hectareas: decimal
+    +lotes: int
+    +inversion_total: decimal
+    +gastos_operativos: decimal
+    +ingreso_total: decimal
+    +rendimiento_ha: decimal
+    +produccion_total: decimal
+  }
+
+  class CampanaDiario <<entity>> {
+    +id: int
+    +fecha: date
+    +hectareas_cortadas: decimal
+    +bultos: int
+    +notas: string
+  }
+
+  class Remision <<entity>> {
+    +id: int
+    +fecha: date
+    +nombre_conductor: string
+    +cc_conductor: string
+    +vehiculo_placa: string
+    +origen: string
+    +destino: string
+    +cantidad: string
+    +variedad: string
+    +tel_conductor: string
+    +tel_propietario: string
+    +valor_flete: decimal
+    +enviado_por: string
+    +enviado_cc: string
+    +firma_conductor: string
+    +firma_propietario: string
+    +nota: string
+  }
+}
+
+' Relaciones de pertenencia por usuario
+Usuario "1" -- "0..*" Parcela : administra >
+Usuario "1" -- "0..*" Trabajador : administra >
+Usuario "1" -- "0..*" Maquinaria : administra >
+Usuario "1" -- "0..*" Semilla : administra >
+Usuario "1" -- "0..*" Plaga : registra >
+Usuario "1" -- "0..*" Riego : programa >
+Usuario "1" -- "0..*" Fertilizante : aplica >
+Usuario "1" -- "0..*" Ingreso : registra >
+Usuario "1" -- "0..*" Egreso : registra >
+Usuario "1" -- "0..*" Campana : planifica >
+Usuario "1" -- "0..*" CampanaDiario : reporta >
+Usuario "1" -- "0..*" Remision : emite >
+Usuario "1" -- "0..*" Cambio : publica >
+
+' Relaciones entre módulos
+Parcela "1" -- "0..*" Ingreso : genera >
+Parcela "1" -- "0..*" Riego : recibe >
+Parcela "1" -- "0..*" Fertilizante : recibe >
+
+Campana "1" *-- "0..*" CampanaDiario : contiene
+Campana "1" *-- "0..*" Remision : contiene
+
+note right of Fertilizante
+  El frontend usa este módulo
+  parcialmente con datos mock.
+end note
+@enduml

@@ -1,0 +1,57 @@
+@startuml
+autonumber
+skinparam shadowing false
+
+actor Admin
+participant "Frontend\n(CropManagementDashboard)" as DASH
+participant "Frontend\n(CampanaDetail)" as DETAIL
+participant "API Service\n(api.js)" as API
+participant "Campanas Routes/Controller" as CTRL
+database "MySQL\ncampanas, diario, remisiones" as DB
+participant "jsPDF" as PDF
+
+== Crear campaña ==
+Admin -> DASH: Completa formulario campaña
+DASH -> API: crearCampana(payload)
+API -> CTRL: POST /campanas (JWT)
+CTRL -> DB: INSERT campanas
+DB --> CTRL: campana creada
+CTRL --> API: 201 { data: campana }
+API --> DASH: campana
+DASH -> Admin: Actualiza tabla de campañas
+
+== Abrir detalle ==
+Admin -> DETAIL: Entrar a /admin/campanas/:id
+DETAIL -> API: fetchCampana(id)
+API -> CTRL: GET /campanas/:id
+CTRL -> DB: SELECT campana
+DB --> CTRL: campana
+CTRL --> API: 200 { data: campana }
+
+DETAIL -> API: fetchCampanaDiario(id)
+API -> CTRL: GET /campanas/:id/diario
+CTRL -> DB: SELECT campanas_diario
+DB --> CTRL: registros
+CTRL --> API: 200 { data: diario }
+
+DETAIL -> API: fetchRemisiones(id)
+API -> CTRL: GET /campanas/:id/remisiones
+CTRL -> DB: SELECT remisiones
+DB --> CTRL: remisiones
+CTRL --> API: 200 { data: remisiones }
+
+== Crear o editar remisión ==
+Admin -> DETAIL: Guardar remisión
+DETAIL -> API: crearRemision(...) / actualizarRemision(...)
+API -> CTRL: POST/PUT /campanas/:id/remisiones
+CTRL -> DB: INSERT/UPDATE remisiones
+DB --> CTRL: remisión persistida
+CTRL --> API: 200/201 { data: remision }
+API --> DETAIL: remision
+
+== Generar PDF con firmas ==
+Admin -> DETAIL: Abrir modal de firma
+Admin -> DETAIL: Confirmar "Generar PDF"
+DETAIL -> PDF: construir documento (datos + firmas)
+PDF --> Admin: remision_campana_{id}_#{remisionId}.pdf
+@enduml

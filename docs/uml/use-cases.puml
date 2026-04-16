@@ -1,0 +1,110 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam linetype ortho
+skinparam ArrowThickness 1.5
+skinparam usecase {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  ArrowColor #334155
+}
+skinparam rectangle {
+  BorderColor #0F172A
+}
+
+actor "Visitante" as Visitante
+actor "Usuario autenticado\n(admin/user)" as Usuario
+actor "Owner\n(dueño de la app)" as Owner
+actor "Proveedor IA externo\n(OpenAI opcional)" as AIExt
+actor "MySQL" as DB
+
+Owner --|> Usuario
+
+rectangle "AgroManager" {
+  package "Portal público" {
+    usecase "Ver landing" as UC_Landing
+    usecase "Consultar cambios públicos" as UC_CambiosPublicos
+  }
+
+  package "Acceso y sesión" {
+    usecase "Iniciar sesión" as UC_Login
+  }
+
+  package "Gestión operativa agrícola" {
+    usecase "Gestionar parcelas" as UC_Parcelas
+    usecase "Gestionar trabajadores" as UC_Trabajadores
+    usecase "Gestionar finanzas\n(ingresos/egresos)" as UC_Finanzas
+    usecase "Gestionar maquinaria" as UC_Maquinaria
+    usecase "Gestionar semillas" as UC_Semillas
+    usecase "Gestionar plagas" as UC_Plagas
+    usecase "Gestionar riego" as UC_Riego
+  }
+
+  package "Campañas" {
+    usecase "Gestionar campañas" as UC_Campanas
+    usecase "Gestionar diario de campaña" as UC_Diario
+    usecase "Gestionar remisiones" as UC_Remisiones
+    usecase "Generar PDF de remisión\ncon firmas" as UC_PDF
+  }
+
+  package "Inteligencia y soporte" {
+    usecase "Solicitar recomendación IA" as UC_IA
+    usecase "Construir contexto del dashboard\n(stats, alertas, transacciones)" as UC_Contexto
+  }
+
+  package "Administración owner" {
+    usecase "Gestionar usuarios" as UC_Usuarios
+    usecase "Publicar cambios/novedades" as UC_PublicarCambios
+  }
+}
+
+Visitante -[#2563EB]-> UC_Landing
+Visitante -[#2563EB]-> UC_CambiosPublicos
+Visitante -[#2563EB]-> UC_Login
+
+Usuario -[#16A34A]-> UC_Login
+Usuario -[#16A34A]-> UC_Parcelas
+Usuario -[#16A34A]-> UC_Trabajadores
+Usuario -[#16A34A]-> UC_Finanzas
+Usuario -[#16A34A]-> UC_Maquinaria
+Usuario -[#16A34A]-> UC_Semillas
+Usuario -[#16A34A]-> UC_Plagas
+Usuario -[#16A34A]-> UC_Riego
+Usuario -[#16A34A]-> UC_Campanas
+Usuario -[#16A34A]-> UC_IA
+
+Owner -[#CA8A04]-> UC_Usuarios
+Owner -[#CA8A04]-> UC_PublicarCambios
+
+AIExt -[#7C3AED]-> UC_IA
+DB -[#DC2626]-> UC_Login
+DB -[#DC2626]-> UC_Parcelas
+DB -[#DC2626]-> UC_Trabajadores
+DB -[#DC2626]-> UC_Finanzas
+DB -[#DC2626]-> UC_Maquinaria
+DB -[#DC2626]-> UC_Semillas
+DB -[#DC2626]-> UC_Plagas
+DB -[#DC2626]-> UC_Riego
+DB -[#DC2626]-> UC_Campanas
+DB -[#DC2626]-> UC_Usuarios
+DB -[#DC2626]-> UC_PublicarCambios
+
+legend right
+|= Color |= Actor |
+|<#2563EB> Azul | Visitante |
+|<#16A34A> Verde | Usuario autenticado |
+|<#CA8A04> Amarillo | Owner |
+|<#7C3AED> Morado | Proveedor IA externo |
+|<#DC2626> Rojo | MySQL |
+endlegend
+
+note bottom
+  Vista integral del sistema AgroManager:
+  - Público: landing y cambios
+  - Privado: operación agrícola, campañas y IA
+  - Owner: gestión de usuarios y publicaciones
+  - Diagrama simplificado: se muestran solo líneas actor -> caso de uso
+end note
+@enduml
