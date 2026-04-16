@@ -14,8 +14,6 @@ import FertilizantesTable from '../components/sections/FertilizantesTable.jsx';
 import ReportesGrid from '../components/sections/ReportesGrid.jsx';
 import CampanasTable from '../components/sections/CampanasTable.jsx';
 import TractorLoader from '../components/TractorLoader.jsx';
-import ChatBot from '../components/ChatBot.jsx';
-import '../styles/ChatBot.css';
 
 import {
   parcelas as initialParcelas,
@@ -1943,8 +1941,6 @@ const CropManagementDashboard = () => {
           </div>
         </div>
       )}
-
-      <ChatBot />
 
       {egresoModalOpen && (
         <div className="am-modal-backdrop">

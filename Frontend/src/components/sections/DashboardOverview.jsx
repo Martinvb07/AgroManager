@@ -141,7 +141,7 @@ const DashboardOverview = ({ stats, ingresos, egresos, alerts = [] }) => {
       </div>
 
       <div style={{ marginTop: '24px' }}>
-        <AiAssistantCard stats={safeStats} ingresos={ingresos} egresos={egresos} alerts={alertCards} />
+        <AiAssistantCard />
       </div>
     </div>
   );

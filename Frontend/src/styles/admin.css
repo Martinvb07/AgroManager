@@ -1,6 +1,12 @@
 /* Estilos base para el panel Admin (CropManagementDashboard + secciones).
    Nota: se limita a clases con prefijo am- / head- para no afectar otras vistas. */
 
+/* AgroBot typing animation */
+@keyframes agrobot-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
 :root {
   --am-surface: #ffffff;
   --am-border: #e5e7eb;

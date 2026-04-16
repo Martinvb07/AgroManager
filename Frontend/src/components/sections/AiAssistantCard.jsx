@@ -1,155 +1,308 @@
-import { useMemo, useState } from 'react';
-import { Sparkles } from 'lucide-react';
-import { pedirConsejoIA } from '../../services/api.js';
+import { useState, useRef, useEffect } from 'react';
+import { Bot, Send, User } from 'lucide-react';
+import { enviarMensajeChat } from '../../services/api.js';
 
-const baseStyles = {
-  card: {
-    background: '#ffffff',
-    borderRadius: '14px',
-    padding: '16px',
-    border: '1px solid #e5e7eb',
-  },
-  headerRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    marginBottom: '10px',
-  },
-  titleWrap: { display: 'flex', alignItems: 'center', gap: '10px' },
-  title: { margin: 0, fontSize: '14px', fontWeight: 700, color: '#111827' },
-  subtitle: { margin: 0, fontSize: '12px', color: '#6b7280' },
-  textarea: {
-    width: '100%',
-    minHeight: '76px',
-    padding: '10px 12px',
-    borderRadius: '10px',
-    border: '1px solid #e5e7eb',
-    background: '#f9fafb',
-    outline: 'none',
-    fontSize: '13px',
-    resize: 'vertical',
-  },
-  button: {
-    width: '100%',
-    marginTop: '10px',
-    padding: '10px 14px',
-    borderRadius: '999px',
-    border: 'none',
-    cursor: 'pointer',
-    background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
-    color: '#ffffff',
-    fontWeight: 700,
-    fontSize: '13px',
-    boxShadow: '0 10px 24px rgba(15, 23, 42, 0.2)',
-    opacity: 1,
-  },
-  answerBox: {
-    marginTop: '12px',
-    padding: '12px',
-    borderRadius: '10px',
-    border: '1px solid #e5e7eb',
-    background: '#ffffff',
-  },
-  answerText: {
-    margin: 0,
-    whiteSpace: 'pre-wrap',
-    fontSize: '13px',
-    lineHeight: '1.45rem',
-    color: '#111827',
-  },
-  meta: { marginTop: '8px', fontSize: '11px', color: '#6b7280' },
-  error: {
-    marginTop: '10px',
-    fontSize: '12px',
-    color: '#b91c1c',
-    background: '#fee2e2',
-    borderRadius: '10px',
-    padding: '8px 10px',
-  },
-};
-
-export default function AiAssistantCard({ stats, alerts, ingresos, egresos }) {
-  const [question, setQuestion] = useState('Dame 3 acciones prioritarias para esta semana.');
-  const [answer, setAnswer] = useState('');
-  const [provider, setProvider] = useState('');
+export default function AiAssistantCard() {
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content:
+        '¡Hola! Soy AgroBot, tu asistente en AgroManager. Puedo ayudarte con plagas, riego, fertilización, maquinaria, campañas, finanzas y más.\n\n¿En qué te puedo ayudar?',
+    },
+  ]);
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
-  const context = useMemo(() => {
-    const lastTx = (arr, kind) =>
-      Array.isArray(arr)
-        ? arr
-            .slice(0, 3)
-            .map((t) => ({
-              tipo: kind,
-              concepto: t?.concepto || '-',
-              monto: Number(t?.monto) || 0,
-              fecha: t?.fecha || '',
-            }))
-        : [];
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
-    return {
-      stats: stats || {},
-      alerts: Array.isArray(alerts) ? alerts : [],
-      recentTransactions: [...lastTx(ingresos, 'ingreso'), ...lastTx(egresos, 'egreso')],
-    };
-  }, [stats, alerts, ingresos, egresos]);
+  const handleSend = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
 
-  const onAsk = async () => {
-    setError('');
+    const userMsg = { role: 'user', content: text };
+    const updated = [...messages, userMsg];
+    setMessages(updated);
+    setInput('');
     setLoading(true);
+
     try {
-      const data = await pedirConsejoIA({ question, context });
-      setAnswer(data?.answer || 'Sin respuesta.');
-      setProvider(data?.provider || '');
-    } catch (e) {
-      setError(e?.message || 'No se pudo obtener recomendación.');
+      const chatHistory = updated
+        .filter((m) => m.role === 'user' || m.role === 'assistant')
+        .slice(-20);
+
+      const data = await enviarMensajeChat({ messages: chatHistory });
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data?.answer || 'No se recibió respuesta.' },
+      ]);
+    } catch (_) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'Lo siento, hubo un error al procesar tu mensaje. Intenta de nuevo.',
+        },
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
-    <div style={baseStyles.card}>
-      <div style={baseStyles.headerRow}>
-        <div>
-          <div style={baseStyles.titleWrap}>
-            <Sparkles size={18} color="#4f46e5" />
-            <h3 style={baseStyles.title}>Asistente IA</h3>
+    <div style={styles.card}>
+      {/* Header */}
+      <div style={styles.header}>
+        <div style={styles.headerInfo}>
+          <div style={styles.botIcon}>
+            <Bot size={20} color="#fff" />
           </div>
-          <p style={baseStyles.subtitle}>Recomendaciones basadas en tu panel (finanzas, alertas y actividad).</p>
+          <div>
+            <p style={styles.title}>AgroBot</p>
+            <p style={styles.subtitle}>Asistente agrícola inteligente</p>
+          </div>
         </div>
+        <div style={styles.badge}>Chat</div>
       </div>
 
-      <textarea
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        style={baseStyles.textarea}
-        placeholder="Ej: ¿Qué debería priorizar hoy en riego y sanidad?"
-      />
+      {/* Messages */}
+      <div style={styles.messagesContainer}>
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            style={{
+              ...styles.msgRow,
+              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+            }}
+          >
+            {msg.role === 'assistant' && (
+              <div style={styles.msgIconBot}>
+                <Bot size={14} />
+              </div>
+            )}
+            <div
+              style={
+                msg.role === 'user' ? styles.bubbleUser : styles.bubbleBot
+              }
+            >
+              {msg.content.split('\n').map((line, j) => (
+                <span key={j}>
+                  {line}
+                  {j < msg.content.split('\n').length - 1 && <br />}
+                </span>
+              ))}
+            </div>
+            {msg.role === 'user' && (
+              <div style={styles.msgIconUser}>
+                <User size={14} />
+              </div>
+            )}
+          </div>
+        ))}
+        {loading && (
+          <div style={{ ...styles.msgRow, justifyContent: 'flex-start' }}>
+            <div style={styles.msgIconBot}>
+              <Bot size={14} />
+            </div>
+            <div style={{ ...styles.bubbleBot, ...styles.typing }}>
+              <span style={styles.dot} />
+              <span style={{ ...styles.dot, animationDelay: '0.16s' }} />
+              <span style={{ ...styles.dot, animationDelay: '0.32s' }} />
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
 
-      <button
-        type="button"
-        onClick={onAsk}
-        style={{
-          ...baseStyles.button,
-          opacity: loading ? 0.75 : 1,
-          cursor: loading ? 'not-allowed' : 'pointer',
-        }}
-        disabled={loading}
-      >
-        {loading ? 'Generando...' : 'Generar recomendación'}
-      </button>
-
-      {error && <div style={baseStyles.error}>{error}</div>}
-
-      {answer && (
-        <div style={baseStyles.answerBox}>
-          <p style={baseStyles.answerText}>{answer}</p>
-          {provider && <div style={baseStyles.meta}>Proveedor: {provider}</div>}
-        </div>
-      )}
+      {/* Input */}
+      <div style={styles.inputArea}>
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Escribe tu pregunta..."
+          style={styles.input}
+          disabled={loading}
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={loading || !input.trim()}
+          style={{
+            ...styles.sendBtn,
+            opacity: loading || !input.trim() ? 0.5 : 1,
+            cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+          }}
+        >
+          <Send size={16} />
+        </button>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  card: {
+    background: '#ffffff',
+    borderRadius: '14px',
+    border: '1px solid #e5e7eb',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '14px 16px',
+    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+    color: '#fff',
+  },
+  headerInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  botIcon: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    background: 'rgba(255,255,255,0.2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    margin: 0,
+    fontSize: '15px',
+    fontWeight: 700,
+  },
+  subtitle: {
+    margin: 0,
+    fontSize: '11px',
+    opacity: 0.85,
+  },
+  badge: {
+    fontSize: '11px',
+    fontWeight: 600,
+    padding: '3px 10px',
+    borderRadius: '999px',
+    background: 'rgba(255,255,255,0.2)',
+  },
+  messagesContainer: {
+    height: '340px',
+    overflowY: 'auto',
+    padding: '14px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    background: '#f8faf9',
+  },
+  msgRow: {
+    display: 'flex',
+    gap: '8px',
+    maxWidth: '92%',
+  },
+  msgIconBot: {
+    width: '26px',
+    height: '26px',
+    borderRadius: '50%',
+    background: '#dcfce7',
+    color: '#16a34a',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: '2px',
+  },
+  msgIconUser: {
+    width: '26px',
+    height: '26px',
+    borderRadius: '50%',
+    background: '#e0e7ff',
+    color: '#4338ca',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: '2px',
+  },
+  bubbleBot: {
+    padding: '10px 14px',
+    borderRadius: '14px',
+    borderBottomLeftRadius: '4px',
+    fontSize: '13px',
+    lineHeight: '1.5',
+    background: '#fff',
+    color: '#1f2937',
+    border: '1px solid #e5e7eb',
+    wordBreak: 'break-word',
+  },
+  bubbleUser: {
+    padding: '10px 14px',
+    borderRadius: '14px',
+    borderBottomRightRadius: '4px',
+    fontSize: '13px',
+    lineHeight: '1.5',
+    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+    color: '#fff',
+    wordBreak: 'break-word',
+  },
+  typing: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '12px 18px',
+  },
+  dot: {
+    width: '7px',
+    height: '7px',
+    borderRadius: '50%',
+    background: '#9ca3af',
+    display: 'inline-block',
+    animation: 'agrobot-bounce 1.4s infinite ease-in-out',
+  },
+  inputArea: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '12px 14px',
+    borderTop: '1px solid #e5e7eb',
+    background: '#fff',
+  },
+  input: {
+    flex: 1,
+    border: '1px solid #e5e7eb',
+    borderRadius: '10px',
+    padding: '10px 14px',
+    fontSize: '13px',
+    outline: 'none',
+    background: '#f9fafb',
+  },
+  sendBtn: {
+    width: '38px',
+    height: '38px',
+    borderRadius: '10px',
+    border: 'none',
+    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+};
