@@ -225,6 +225,61 @@ async function openAiChat({ messages, context }) {
 }
 
 /**
+ * Busca en Wikipedia en español. Gratis, sin API key.
+ * Devuelve un extracto corto y relevante.
+ */
+async function searchWikipedia(query) {
+  try {
+    const searchUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=3&format=json&utf8=1`;
+    const searchRes = await fetch(searchUrl);
+    if (!searchRes.ok) return null;
+
+    const searchData = await searchRes.json();
+    const results = searchData?.query?.search;
+    if (!results || results.length === 0) return null;
+
+    const pageTitle = results[0].title;
+
+    // Obtener solo la intro del artículo (resumen conciso)
+    const extractUrl = `https://es.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=extracts&exintro=1&explaintext=1&exchars=800&format=json&utf8=1`;
+    const extractRes = await fetch(extractUrl);
+    if (!extractRes.ok) return null;
+
+    const extractData = await extractRes.json();
+    const pages = extractData?.query?.pages;
+    if (!pages) return null;
+
+    const page = Object.values(pages)[0];
+    const extract = page?.extract;
+    if (!extract || extract.length < 40) return null;
+
+    let text = extract.replace(/\n{3,}/g, '\n\n').trim();
+
+    // Cortar en un punto lógico cerca de 600 chars
+    if (text.length > 600) {
+      const cut = text.lastIndexOf('.', 600);
+      text = cut > 200 ? text.slice(0, cut + 1) : text.slice(0, 600) + '...';
+    }
+
+    return { title: pageTitle, text };
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * Extrae los términos clave de la pregunta para buscar en Wikipedia.
+ */
+function buildSearchQuery(question) {
+  const stopWords = ['que', 'qué', 'como', 'cómo', 'cual', 'cuál', 'para', 'por', 'los', 'las', 'del', 'de', 'el', 'la', 'un', 'una', 'me', 'mi', 'mis', 'te', 'tu', 'tus', 'es', 'son', 'hay', 'hago', 'hacer', 'puedo', 'debo', 'debería', 'necesito', 'tengo', 'recomiendas', 'recomendaciones', 'tratamientos', 'tratamiento', 'cuánto', 'cuánta', 'cuántos', 'cuántas', 'con', 'sin', 'más', 'muy', 'algo', 'sobre', 'cuando', 'donde', 'favor', 'gracias', 'por favor'];
+  const words = question.toLowerCase()
+    .replace(/[¿?¡!.,;:]/g, '')
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !stopWords.includes(w));
+  return words.join(' ');
+}
+
+/**
  * Busca en knowledge.json las categorías que coincidan con la pregunta del usuario.
  * Devuelve la info general + la específica más relevante.
  */
@@ -272,159 +327,170 @@ function findKnowledge(question) {
 }
 
 /**
- * Genera un resumen en texto del contexto del usuario (datos de la BD)
- * para incluirlo en la respuesta.
+ * Detecta qué temas específicos menciona la pregunta y devuelve
+ * SOLO los datos de la BD relevantes a esos temas.
  */
-function buildUserDataSummary(dbContext) {
+function getRelevantUserData(q, dbContext) {
   if (!dbContext || typeof dbContext !== 'object') return '';
 
   const parts = [];
+  const fmt = (n) => `$${Number(n || 0).toLocaleString('es-ES')}`;
 
   // Parcelas
-  const parcelas = dbContext.parcelas;
-  if (Array.isArray(parcelas) && parcelas.length) {
-    parts.push(`Tus parcelas (${parcelas.length}):`);
-    for (const p of parcelas.slice(0, 5)) {
-      parts.push(`  - ${p.nombre}: ${p.hectareas} ha, cultivo: ${p.cultivo || 'sin definir'}, estado: ${p.estado}`);
-    }
+  if (q.includes('parcela') || q.includes('terreno') || q.includes('lote') || q.includes('hectárea') || q.includes('cuánta')) {
+    const d = dbContext.parcelas;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} parcela(s):`);
+      for (const p of d) parts.push(`- ${p.nombre}: ${p.hectareas} ha, cultivo: ${p.cultivo || 'sin definir'}, estado: ${p.estado}`);
+    } else parts.push('No tienes parcelas registradas.');
   }
 
   // Plagas
-  const plagas = dbContext.plagas;
-  if (Array.isArray(plagas) && plagas.length) {
-    parts.push(`\nPlagas registradas (${plagas.length}):`);
-    for (const p of plagas.slice(0, 5)) {
-      const fecha = p.fechaDeteccion ? ` (${String(p.fechaDeteccion).slice(0, 10)})` : '';
-      parts.push(`  - ${p.tipo || 'Sin tipo'} en ${p.cultivo || '?'}, severidad: ${p.severidad}${fecha}${p.tratamiento ? ', tratamiento: ' + p.tratamiento : ''}`);
-    }
+  if (q.includes('plaga') || q.includes('insecto') || q.includes('enfermedad') || q.includes('hongo')) {
+    const d = dbContext.plagas;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} plaga(s) registrada(s):`);
+      for (const p of d.slice(0, 5)) {
+        parts.push(`- ${p.tipo || '?'} en ${p.cultivo || '?'} (${p.severidad})${p.tratamiento ? ' — tratamiento: ' + p.tratamiento : ''}`);
+      }
+    } else parts.push('No tienes plagas registradas.');
   }
 
   // Riego
-  const riego = dbContext.riego;
-  if (Array.isArray(riego) && riego.length) {
-    parts.push(`\nRiego programado (${riego.length}):`);
-    for (const r of riego.slice(0, 5)) {
-      const ultimo = r.ultimoRiego ? String(r.ultimoRiego).slice(0, 10) : '?';
-      const proximo = r.proximoRiego ? String(r.proximoRiego).slice(0, 10) : '?';
-      parts.push(`  - ${r.parcela || 'Sin parcela'}: ${r.tipo || '?'}, último: ${ultimo}, próximo: ${proximo}`);
-    }
+  if (q.includes('riego') || q.includes('agua')) {
+    const d = dbContext.riego;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} programación(es) de riego:`);
+      for (const r of d.slice(0, 5)) {
+        parts.push(`- ${r.parcela || '?'}: ${r.tipo || '?'}, último: ${String(r.ultimoRiego || '?').slice(0, 10)}, próximo: ${String(r.proximoRiego || '?').slice(0, 10)}`);
+      }
+    } else parts.push('No tienes riego programado.');
   }
 
   // Maquinaria
-  const maq = dbContext.maquinaria;
-  if (Array.isArray(maq) && maq.length) {
-    parts.push(`\nMaquinaria (${maq.length}):`);
-    for (const m of maq.slice(0, 5)) {
-      const prox = m.proximoMantenimiento ? `, próx. mant: ${String(m.proximoMantenimiento).slice(0, 10)}` : '';
-      parts.push(`  - ${m.nombre} (${m.tipo || '?'}): ${m.estado}${prox}`);
-    }
+  if (q.includes('maquinaria') || q.includes('tractor') || q.includes('equipo') || q.includes('mantenimiento')) {
+    const d = dbContext.maquinaria;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} equipo(s):`);
+      for (const m of d.slice(0, 5)) {
+        const prox = m.proximoMantenimiento ? `, próx. mant: ${String(m.proximoMantenimiento).slice(0, 10)}` : '';
+        parts.push(`- ${m.nombre} (${m.tipo || '?'}): ${m.estado}${prox}`);
+      }
+    } else parts.push('No tienes maquinaria registrada.');
   }
 
-  // Finanzas del mes
-  const resumen = dbContext.resumenMes;
-  if (resumen) {
-    parts.push(`\nFinanzas del mes (${resumen.mes}):`);
-    parts.push(`  - Ingresos: $${Number(resumen.ingresosMes || 0).toLocaleString('es-ES')}`);
-    parts.push(`  - Egresos: $${Number(resumen.egresosMes || 0).toLocaleString('es-ES')}`);
-    parts.push(`  - Balance: $${Number(resumen.balance || 0).toLocaleString('es-ES')}`);
+  // Finanzas
+  if (q.includes('finanza') || q.includes('ingreso') || q.includes('egreso') || q.includes('gasto') || q.includes('dinero') || q.includes('balance') || q.includes('costo')) {
+    const r = dbContext.resumenMes;
+    if (r) {
+      parts.push(`Finanzas del mes (${r.mes}): Ingresos ${fmt(r.ingresosMes)}, Egresos ${fmt(r.egresosMes)}, Balance ${fmt(r.balance)}.`);
+    }
   }
 
   // Campañas
-  const camp = dbContext.campanas;
-  if (Array.isArray(camp) && camp.length) {
-    parts.push(`\nCampañas recientes (${camp.length}):`);
-    for (const c of camp.slice(0, 3)) {
-      parts.push(`  - ${c.nombre}: ${c.hectareas || '?'} ha, inversión: $${Number(c.inversionTotal || 0).toLocaleString('es-ES')}, ingreso: $${Number(c.ingresoTotal || 0).toLocaleString('es-ES')}`);
-    }
+  if (q.includes('campaña') || q.includes('cosecha') || q.includes('producción') || q.includes('rendimiento')) {
+    const d = dbContext.campanas;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} campaña(s):`);
+      for (const c of d.slice(0, 3)) {
+        parts.push(`- ${c.nombre}: ${c.hectareas || '?'} ha, inversión: ${fmt(c.inversionTotal)}, ingreso: ${fmt(c.ingresoTotal)}`);
+      }
+    } else parts.push('No tienes campañas registradas.');
   }
 
   // Trabajadores
-  const trab = dbContext.trabajadores;
-  if (Array.isArray(trab) && trab.length) {
-    parts.push(`\nTrabajadores (${trab.length}):`);
-    for (const t of trab.slice(0, 5)) {
-      parts.push(`  - ${t.nombre}: ${t.cargo || '?'}, estado: ${t.estado}`);
-    }
+  if (q.includes('trabajador') || q.includes('personal') || q.includes('empleado') || q.includes('salario')) {
+    const d = dbContext.trabajadores;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} trabajador(es):`);
+      for (const t of d.slice(0, 5)) parts.push(`- ${t.nombre}: ${t.cargo || '?'}, ${t.estado}`);
+    } else parts.push('No tienes trabajadores registrados.');
   }
 
   // Semillas
-  const sem = dbContext.semillas;
-  if (Array.isArray(sem) && sem.length) {
-    parts.push(`\nSemillas en inventario (${sem.length}):`);
-    for (const s of sem.slice(0, 5)) {
-      parts.push(`  - ${s.tipo}: ${s.cantidad} unidades, proveedor: ${s.proveedor || '?'}`);
-    }
+  if (q.includes('semilla') || q.includes('siembra')) {
+    const d = dbContext.semillas;
+    if (Array.isArray(d) && d.length) {
+      parts.push(`Tienes ${d.length} tipo(s) de semilla:`);
+      for (const s of d.slice(0, 5)) parts.push(`- ${s.tipo}: ${s.cantidad} und, proveedor: ${s.proveedor || '?'}`);
+    } else parts.push('No tienes semillas registradas.');
   }
 
   return parts.join('\n');
 }
 
 /**
- * Chatbot heurístico: busca en knowledge.json + datos del usuario en la BD.
- * No usa ninguna API externa.
+ * Genera resumen general SOLO cuando el usuario pide un panorama completo.
  */
-function buildHeuristicChat({ messages, dbContext }) {
+function buildFullSummary(dbContext) {
+  if (!dbContext || typeof dbContext !== 'object') return 'No tienes datos registrados aún.';
+  const fmt = (n) => `$${Number(n || 0).toLocaleString('es-ES')}`;
+  const parts = [];
+  const p = dbContext.parcelas; if (Array.isArray(p) && p.length) parts.push(`Parcelas: ${p.length} (${p.map(x => x.nombre).join(', ')})`);
+  const pl = dbContext.plagas; if (Array.isArray(pl) && pl.length) parts.push(`Plagas activas: ${pl.length}`);
+  const r = dbContext.riego; if (Array.isArray(r) && r.length) parts.push(`Riegos programados: ${r.length}`);
+  const m = dbContext.maquinaria; if (Array.isArray(m) && m.length) parts.push(`Equipos: ${m.length}`);
+  const c = dbContext.campanas; if (Array.isArray(c) && c.length) parts.push(`Campañas: ${c.length}`);
+  const t = dbContext.trabajadores; if (Array.isArray(t) && t.length) parts.push(`Trabajadores: ${t.length}`);
+  const rm = dbContext.resumenMes; if (rm) parts.push(`Balance del mes: ${fmt(rm.balance)}`);
+  return parts.length ? parts.join('\n') : 'No tienes datos registrados aún.';
+}
+
+/**
+ * Chatbot heurístico: responde usando knowledge.json + Wikipedia + datos de la BD.
+ */
+async function buildHeuristicChat({ messages, dbContext }) {
   const lastMsg = messages[messages.length - 1]?.content || '';
   const q = lastMsg.toLowerCase();
 
-  // Buscar conocimiento relevante
-  const matches = findKnowledge(q);
-  const parts = [];
-
-  // Si el usuario pregunta por sus datos / información personal
+  // Detectar si pregunta por SUS datos
   const askingAboutData = q.includes('mis ') || q.includes('mi ') || q.includes('tengo') ||
-    q.includes('cuánto') || q.includes('cuánta') || q.includes('cómo está') || q.includes('cómo van') ||
-    q.includes('estado de') || q.includes('resumen') || q.includes('datos');
+    q.includes('cuánto') || q.includes('cuánta') || q.includes('cuántos') ||
+    q.includes('cómo está') || q.includes('cómo van');
+
+  // Detectar si pide resumen general
+  const askingFullSummary = q.includes('resumen') || q.includes('todo') || q.includes('general') || q.includes('panorama');
+
+  // Saludos simples
+  if (/^(hola|hey|buenas?|buenos?\s|qué tal|saludos)/i.test(q.trim())) {
+    return '¡Hola! Soy AgroBot. ¿En qué te puedo ayudar hoy?';
+  }
+
+  // Si pregunta solo por sus datos (ej: "cuántas parcelas tengo")
+  if (askingAboutData && dbContext) {
+    const data = getRelevantUserData(q, dbContext);
+    if (data) return data;
+    if (askingFullSummary) return buildFullSummary(dbContext);
+    return buildFullSummary(dbContext);
+  }
+
+  // Buscar conocimiento relevante del JSON
+  const matches = findKnowledge(q);
+  const searchQuery = buildSearchQuery(lastMsg);
 
   if (matches.length > 0) {
     const best = matches[0];
 
-    // Si hay info específica (ej: preguntó por "sogata" o "goteo"), priorizarla
-    if (best.specific) {
-      parts.push(best.specific);
-    } else if (best.byCrop) {
-      parts.push(best.byCrop);
-    } else {
-      parts.push(best.general);
+    // Si tenemos respuesta específica del JSON (ej: "sogata", "goteo"), usarla directo
+    if (best.specific) return best.specific;
+    if (best.byCrop) return best.byCrop;
+
+    // Si solo hay info general, intentar Wikipedia para algo más preciso
+    if (searchQuery.length > 3) {
+      const wiki = await searchWikipedia(searchQuery);
+      if (wiki) return wiki.text;
     }
 
-    // Si el usuario pregunta por sus datos, agregar resumen de la BD
-    if (askingAboutData && dbContext) {
-      const summary = buildUserDataSummary(dbContext);
-      if (summary) {
-        parts.push('\n--- Tu información en AgroManager ---\n');
-        parts.push(summary);
-      }
-    }
-
-    // Si hay categorías secundarias relevantes, mencionar brevemente
-    if (matches.length > 1 && matches[1].score >= 2) {
-      parts.push(`\nTambién tengo información sobre ${matches[1].category}. ¿Quieres que te cuente más?`);
-    }
-  } else if (askingAboutData && dbContext) {
-    // No encontró tema agrícola pero pide sus datos
-    parts.push('Aquí tienes un resumen de tu información en AgroManager:\n');
-    const summary = buildUserDataSummary(dbContext);
-    if (summary) {
-      parts.push(summary);
-    } else {
-      parts.push('No tienes datos registrados aún. Empieza agregando parcelas, trabajadores o registrando ingresos/egresos.');
-    }
-    parts.push('\n¿Sobre qué tema necesitas orientación?');
-  } else {
-    // Respuesta por defecto
-    parts.push('Soy AgroBot, tu asistente agrícola en AgroManager. Puedo ayudarte con:\n');
-    parts.push('- Plagas: identificación, control y tratamiento');
-    parts.push('- Riego: tipos, frecuencias y recomendaciones por cultivo');
-    parts.push('- Fertilización: planes, dosis y productos');
-    parts.push('- Maquinaria: mantenimiento preventivo');
-    parts.push('- Campañas: seguimiento de producción y cosecha');
-    parts.push('- Finanzas: control de ingresos y egresos');
-    parts.push('- Parcelas, semillas, personal y reportes');
-    parts.push('\nTambién puedo consultar tu información registrada. Pregúntame, por ejemplo: "¿Cómo están mis parcelas?" o "¿Qué plagas tengo?"');
+    return best.general;
   }
 
-  return parts.join('\n');
+  // No encontró nada en el JSON → buscar en Wikipedia
+  if (searchQuery.length > 3) {
+    const wiki = await searchWikipedia(searchQuery);
+    if (wiki) return wiki.text;
+  }
+
+  return 'No encontré información sobre eso. Puedo ayudarte con temas agrícolas como plagas, riego, fertilización, maquinaria, campañas o finanzas.';
 }
 
 async function anthropicChat({ messages, context }) {
@@ -565,7 +631,7 @@ export const aiService = {
       return { answer, provider: 'openai' };
     }
 
-    const answer = buildHeuristicChat({ messages, dbContext });
+    const answer = await buildHeuristicChat({ messages, dbContext });
     return { answer, provider: 'heuristic' };
   },
 };

@@ -6,8 +6,7 @@ export default function AiAssistantCard() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content:
-        '¡Hola! Soy AgroBot, tu asistente en AgroManager. Puedo ayudarte con plagas, riego, fertilización, maquinaria, campañas, finanzas y más.\n\n¿En qué te puedo ayudar?',
+      content: '¡Hola! Soy AgroBot. ¿En qué te puedo ayudar hoy?',
     },
   ]);
   const [input, setInput] = useState('');
