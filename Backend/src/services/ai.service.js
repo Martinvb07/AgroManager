@@ -269,50 +269,98 @@ async function searchWikipedia(query) {
 
 /**
  * Extrae los términos clave de la pregunta para buscar en Wikipedia.
+ * Construye una query específica que combine tema + cultivo.
  */
 function buildSearchQuery(question) {
-  const stopWords = ['que', 'qué', 'como', 'cómo', 'cual', 'cuál', 'para', 'por', 'los', 'las', 'del', 'de', 'el', 'la', 'un', 'una', 'me', 'mi', 'mis', 'te', 'tu', 'tus', 'es', 'son', 'hay', 'hago', 'hacer', 'puedo', 'debo', 'debería', 'necesito', 'tengo', 'recomiendas', 'recomendaciones', 'tratamientos', 'tratamiento', 'cuánto', 'cuánta', 'cuántos', 'cuántas', 'con', 'sin', 'más', 'muy', 'algo', 'sobre', 'cuando', 'donde', 'favor', 'gracias', 'por favor'];
-  const words = question.toLowerCase()
-    .replace(/[¿?¡!.,;:]/g, '')
-    .split(/\s+/)
-    .filter((w) => w.length > 2 && !stopWords.includes(w));
-  return words.join(' ');
+  const stopWords = ['que', 'qué', 'como', 'cómo', 'cual', 'cuál', 'para', 'por', 'los', 'las', 'del', 'de', 'el', 'la', 'un', 'una', 'me', 'mi', 'mis', 'te', 'tu', 'tus', 'es', 'son', 'hay', 'hago', 'hacer', 'puedo', 'debo', 'debería', 'necesito', 'tengo', 'recomiendas', 'recomendaciones', 'cuánto', 'cuánta', 'cuántos', 'cuántas', 'con', 'sin', 'más', 'muy', 'algo', 'sobre', 'cuando', 'donde', 'favor', 'gracias', 'por favor'];
+  const q = question.toLowerCase().replace(/[¿?¡!.,;:]/g, '');
+  const words = q.split(/\s+/).filter((w) => w.length > 2 && !stopWords.includes(w));
+
+  // Detectar cultivos para hacer query más específica
+  const crops = ['arroz', 'maíz', 'maiz', 'soja', 'trigo', 'café', 'cafe', 'caña', 'cana', 'tomate', 'papa', 'frijol', 'algodón', 'algodon', 'sorgo', 'yuca', 'plátano', 'platano', 'cacao', 'palma'];
+  const topics = ['fertilizante', 'fertilización', 'fertilizacion', 'abono', 'plaga', 'insecticida', 'fungicida', 'herbicida', 'riego', 'tratamiento', 'enfermedad', 'hongo', 'control', 'manejo', 'cosecha', 'siembra', 'semilla', 'nutriente', 'npk', 'nitrógeno', 'fósforo', 'potasio'];
+
+  const foundCrop = crops.find((c) => q.includes(c));
+  const foundTopic = topics.find((t) => q.includes(t));
+
+  // Construir query específica: "fertilización del arroz" en vez de solo "arroz"
+  if (foundTopic && foundCrop) {
+    return `${foundTopic} ${foundCrop} agricultura`;
+  }
+  if (foundCrop) {
+    return `cultivo ${foundCrop} agricultura ${words.filter(w => w !== foundCrop).join(' ')}`.trim();
+  }
+
+  return words.join(' ') + ' agricultura';
 }
 
 /**
- * Busca en knowledge.json las categorías que coincidan con la pregunta del usuario.
- * Devuelve la info general + la específica más relevante.
+ * Busca en knowledge.json las categorías que coincidan con la pregunta.
+ * Combina temas cruzados: ej "fertilizante" + "arroz" busca en ambas categorías.
  */
 function findKnowledge(question) {
   const q = question.toLowerCase();
   const matches = [];
 
+  // Detectar temas cruzados (ej: "fertilizante para el arroz")
+  const topicMap = {
+    fertilizante: ['fertiliz', 'abono', 'nutriente', 'npk', 'urea', 'dap'],
+    plaga: ['plaga', 'insecto', 'enfermedad', 'hongo', 'virus', 'control', 'tratamiento'],
+    riego: ['riego', 'agua', 'humedad'],
+  };
+  const cropMap = ['arroz', 'maíz', 'maiz', 'soja', 'soya', 'café', 'cafe', 'tomate', 'papa'];
+
+  const detectedTopic = Object.entries(topicMap).find(([, kws]) => kws.some((kw) => q.includes(kw)));
+  const detectedCrop = cropMap.find((c) => q.includes(c));
+
+  // Si hay tema + cultivo, buscar en la sección del cultivo la clave específica
+  if (detectedTopic && detectedCrop) {
+    const cropKey = detectedCrop.replace('á', 'a').replace('é', 'e');
+    const cropData = knowledge[cropKey] || knowledge[detectedCrop];
+    if (cropData?.specific) {
+      // Buscar "fertilizante arroz", "plaga arroz", "riego arroz", etc.
+      const combos = [
+        `${detectedTopic[0]} ${detectedCrop}`,
+        `${detectedTopic[0]} ${cropKey}`,
+      ];
+      for (const combo of combos) {
+        if (cropData.specific[combo]) {
+          return [{ category: cropKey, score: 10, specific: cropData.specific[combo] }];
+        }
+      }
+    }
+    // Si no hay específico, devolver el general del cultivo
+    if (cropData) {
+      return [{ category: cropKey, score: 5, general: cropData.general }];
+    }
+  }
+
+  // Búsqueda normal por keywords
   for (const [category, data] of Object.entries(knowledge)) {
     if (!data.keywords) continue;
 
-    // Contar cuántas keywords coinciden
     const matchedKeywords = data.keywords.filter((kw) => q.includes(kw.toLowerCase()));
     if (matchedKeywords.length === 0) continue;
 
     const entry = { category, score: matchedKeywords.length, general: data.general || '' };
 
-    // Buscar coincidencia específica (ej: "sogata", "goteo", "urea")
+    // Buscar coincidencia específica
     if (data.specific) {
       for (const [key, text] of Object.entries(data.specific)) {
         if (q.includes(key.toLowerCase())) {
           entry.specific = text;
-          entry.score += 2; // priorizar específicos
+          entry.score += 3;
           break;
         }
       }
     }
 
-    // Buscar por cultivo (solo en riego)
+    // Buscar por cultivo
     if (data.by_crop) {
       for (const [crop, text] of Object.entries(data.by_crop)) {
         if (q.includes(crop.toLowerCase())) {
           entry.byCrop = text;
-          entry.score += 2;
+          entry.score += 3;
           break;
         }
       }
@@ -321,7 +369,6 @@ function findKnowledge(question) {
     matches.push(entry);
   }
 
-  // Ordenar por relevancia
   matches.sort((a, b) => b.score - a.score);
   return matches;
 }
@@ -336,13 +383,18 @@ function getRelevantUserData(q, dbContext) {
   const parts = [];
   const fmt = (n) => `$${Number(n || 0).toLocaleString('es-ES')}`;
 
-  // Parcelas
-  if (q.includes('parcela') || q.includes('terreno') || q.includes('lote') || q.includes('hectárea') || q.includes('cuánta')) {
+  // Parcelas y cultivos
+  if (q.includes('parcela') || q.includes('terreno') || q.includes('lote') || q.includes('hectárea') || q.includes('cuánta') || q.includes('cultivo') || q.includes('sembr')) {
     const d = dbContext.parcelas;
     if (Array.isArray(d) && d.length) {
-      parts.push(`Tienes ${d.length} parcela(s):`);
-      for (const p of d) parts.push(`- ${p.nombre}: ${p.hectareas} ha, cultivo: ${p.cultivo || 'sin definir'}, estado: ${p.estado}`);
-    } else parts.push('No tienes parcelas registradas.');
+      if (q.includes('cultivo') || q.includes('sembr')) {
+        parts.push(`Tus cultivos:`);
+        for (const p of d) parts.push(`- ${p.nombre}: ${p.cultivo || 'sin cultivo definido'} (${p.hectareas} ha, ${p.estado})`);
+      } else {
+        parts.push(`Tienes ${d.length} parcela(s):`);
+        for (const p of d) parts.push(`- ${p.nombre}: ${p.hectareas} ha, cultivo: ${p.cultivo || 'sin definir'}, estado: ${p.estado}`);
+      }
+    } else parts.push('No tienes parcelas ni cultivos registrados.');
   }
 
   // Plagas
